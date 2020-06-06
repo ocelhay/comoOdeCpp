@@ -17,8 +17,9 @@ The DESCRIPTION file:
 }
 \author{
 \packageAuthor{comoOdeCpp}
+Ricardo Aguas, Sompob Saralamba, Bo Gao
 
-Maintainer: \packageMaintainer{comoOdeCpp}
+Maintainer: Bo Gao \packageMaintainer{comoOdeCpp}
 }
 \references{
 ~~ Literature or other references for background information ~~

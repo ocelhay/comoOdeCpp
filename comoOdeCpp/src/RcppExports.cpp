@@ -6,55 +6,54 @@
 
 using namespace Rcpp;
 
-// rcpparma_hello_world
-arma::mat rcpparma_hello_world();
-RcppExport SEXP _comoOdeCpp_rcpparma_hello_world() {
+// covidOdeCpp_print_timing
+void covidOdeCpp_print_timing();
+RcppExport SEXP _comoOdeCpp_covidOdeCpp_print_timing() {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpparma_hello_world());
-    return rcpp_result_gen;
+    covidOdeCpp_print_timing();
+    return R_NilValue;
 END_RCPP
 }
-// rcpparma_outerproduct
-arma::mat rcpparma_outerproduct(const arma::colvec& x);
-RcppExport SEXP _comoOdeCpp_rcpparma_outerproduct(SEXP xSEXP) {
+// covidOdeCpp_reset
+void covidOdeCpp_reset();
+RcppExport SEXP _comoOdeCpp_covidOdeCpp_reset() {
 BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_outerproduct(x));
-    return rcpp_result_gen;
+    covidOdeCpp_reset();
+    return R_NilValue;
 END_RCPP
 }
-// rcpparma_innerproduct
-double rcpparma_innerproduct(const arma::colvec& x);
-RcppExport SEXP _comoOdeCpp_rcpparma_innerproduct(SEXP xSEXP) {
+// covidOdeCpp
+List covidOdeCpp(double t, const arma::vec& y, const List& parameters, const List& input, int A, const arma::mat& contact_home, const arma::mat& contact_school, const arma::mat& contact_work, const arma::mat& contact_other, const arma::vec& popbirth_col2, const arma::vec& popstruc_col2, const arma::mat& ageing, const arma::vec& ifr_col2, const arma::vec& ihr_col2, const arma::vec& mort_col);
+RcppExport SEXP _comoOdeCpp_covidOdeCpp(SEXP tSEXP, SEXP ySEXP, SEXP parametersSEXP, SEXP inputSEXP, SEXP ASEXP, SEXP contact_homeSEXP, SEXP contact_schoolSEXP, SEXP contact_workSEXP, SEXP contact_otherSEXP, SEXP popbirth_col2SEXP, SEXP popstruc_col2SEXP, SEXP ageingSEXP, SEXP ifr_col2SEXP, SEXP ihr_col2SEXP, SEXP mort_colSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_innerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_bothproducts
-Rcpp::List rcpparma_bothproducts(const arma::colvec& x);
-RcppExport SEXP _comoOdeCpp_rcpparma_bothproducts(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_bothproducts(x));
+    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const List& >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< const List& >::type input(inputSEXP);
+    Rcpp::traits::input_parameter< int >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type contact_home(contact_homeSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type contact_school(contact_schoolSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type contact_work(contact_workSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type contact_other(contact_otherSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type popbirth_col2(popbirth_col2SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type popstruc_col2(popstruc_col2SEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type ageing(ageingSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type ifr_col2(ifr_col2SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type ihr_col2(ihr_col2SEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type mort_col(mort_colSEXP);
+    rcpp_result_gen = Rcpp::wrap(covidOdeCpp(t, y, parameters, input, A, contact_home, contact_school, contact_work, contact_other, popbirth_col2, popstruc_col2, ageing, ifr_col2, ihr_col2, mort_col));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_comoOdeCpp_rcpparma_hello_world", (DL_FUNC) &_comoOdeCpp_rcpparma_hello_world, 0},
-    {"_comoOdeCpp_rcpparma_outerproduct", (DL_FUNC) &_comoOdeCpp_rcpparma_outerproduct, 1},
-    {"_comoOdeCpp_rcpparma_innerproduct", (DL_FUNC) &_comoOdeCpp_rcpparma_innerproduct, 1},
-    {"_comoOdeCpp_rcpparma_bothproducts", (DL_FUNC) &_comoOdeCpp_rcpparma_bothproducts, 1},
+    {"_comoOdeCpp_covidOdeCpp_print_timing", (DL_FUNC) &_comoOdeCpp_covidOdeCpp_print_timing, 0},
+    {"_comoOdeCpp_covidOdeCpp_reset", (DL_FUNC) &_comoOdeCpp_covidOdeCpp_reset, 0},
+    {"_comoOdeCpp_covidOdeCpp", (DL_FUNC) &_comoOdeCpp_covidOdeCpp, 15},
     {NULL, NULL, 0}
 };
 

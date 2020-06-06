@@ -1,11 +1,11 @@
 Package: comoOdeCpp
 Type: Package
-Title: What the package does (short line)
-Version: 1.0
+Title: Cpp version of CoMo Consortium's COVID-19 transmission model
+Version: 13.8.1
 Date: 2020-06-06
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: Ricardo Aguas, Sompob Saralamba, Bo Gao
+Maintainer: Bo Gao <bo.gao@ndm.ox.ac.uk>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: Attribution-NonCommercial 4.0 International
 Imports: Rcpp (>= 1.0.4.6)
 LinkingTo: Rcpp, RcppArmadillo

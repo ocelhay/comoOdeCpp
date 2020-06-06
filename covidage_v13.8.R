@@ -1,31 +1,36 @@
+rm(list = ls())
+
 require("deSolve")
 library("ggplot2")
 library("dplyr")
 library("reshape2")
-require(gridExtra)
-library(ggpubr)
-library(bsplus)
-library(deSolve)
-library(DT)
-library(highcharter)
-library(lubridate)
-library(pushbar)
-library(readxl)
-library(reshape2)
-library(scales)
-library(shiny)
-library(shinyBS)
-library(shinycssloaders)
-library(shinyhelper)
-library(shinythemes)
-library(shinyWidgets)
-library(tidyverse)
-library(XLConnect)
+require("gridExtra")
+# library(ggpubr)
+# library(bsplus)
+# library(deSolve)
+# library(DT)
+# library(highcharter)
+# library(lubridate)
+# library(pushbar)
+library("readxl")
+# library(reshape2)
+# library(scales)
+# library(shiny)
+# library(shinyBS)
+# library(shinycssloaders)
+# library(shinyhelper)
+# library(shinythemes)
+# library(shinyWidgets)
+# library(tidyverse)
+# library(XLConnect)
+
+# library("Rcpp")
+# Rcpp.package.skeleton("foobar")
 
 #read data from excel file
-setwd("C:/covid19/covid_age")
-load("data_CoMo.RData")
-file_path <- paste0(getwd(),"/Template_CoMoCOVID-19App_new.xlsx")  
+setwd("/home/bogao/Projects/ATOME-MORU/comoOdeCpp")
+load("./data/data_CoMo.RData")
+file_path <- paste0(getwd(),"/data/Template_CoMoCOVID-19App_new.xlsx")  
 country_name<-"Cambodia"
 
 # Cases
@@ -702,6 +707,16 @@ inputs<-function(inp, run){
 vectors<-inputs(inp,'Hypothetical Scenario')
 vectors0<-inputs(inp,'Baseline (Calibration)')
 
+f <- c(1,(1+parameters["give"])/2,(1-parameters["give"])/2,0)
+KH<-parameters["beds_available"]
+KICU<- parameters["icu_beds_available"]+parameters["ventilators_available"]
+Kvent<- parameters["ventilators_available"]
+x.H <- c(0,(1+parameters["give"])*KH/2,(3-parameters["give"])*KH/2,2*KH)
+x.ICU <- c(0,(1+parameters["give"])*KICU/2,(3-parameters["give"])*KICU/2,2*KICU)
+x.Vent <- c(0,(1+parameters["give"])*Kvent/2,(3-parameters["give"])*Kvent/2,2*Kvent)
+fH <- splinefun(x.H, f, method = "hyman")
+fICU <- splinefun(x.ICU, f, method = "hyman")
+fVent<- splinefun(x.Vent, f, method = "hyman")
 
 # set up a function to solve the equations
 covid<-function(t, Y, parameters,input) 
@@ -733,16 +748,16 @@ covid<-function(t, Y, parameters,input)
          P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
          
          # health system performance
-         f <- c(1,(1+give)/2,(1-give)/2,0)
-         KH<-beds_available
-         KICU<- icu_beds_available+ventilators_available
-         Kvent<- ventilators_available
-         x.H <- c(0,(1+give)*KH/2,(3-give)*KH/2,2*KH)
-         x.ICU <- c(0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU)
-         x.Vent <- c(0,(1+give)*Kvent/2,(3-give)*Kvent/2,2*Kvent)
-         fH <- splinefun(x.H, f, method = "hyman")
-         fICU <- splinefun(x.ICU, f, method = "hyman")
-         fVent<- splinefun(x.Vent, f, method = "hyman")
+         # f <- c(1,(1+give)/2,(1-give)/2,0)
+         # KH<-beds_available
+         # KICU<- icu_beds_available+ventilators_available
+         # Kvent<- ventilators_available
+         # x.H <- c(0,(1+give)*KH/2,(3-give)*KH/2,2*KH)
+         # x.ICU <- c(0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU)
+         # x.Vent <- c(0,(1+give)*Kvent/2,(3-give)*Kvent/2,2*Kvent)
+         # fH <- splinefun(x.H, f, method = "hyman")
+         # fICU <- splinefun(x.ICU, f, method = "hyman")
+         # fVent<- splinefun(x.Vent, f, method = "hyman")
          critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV)),1)
          crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
@@ -848,7 +863,12 @@ covid<-function(t, Y, parameters,input)
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
          dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
-         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
+         
+         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H
+            + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV
+            + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent
+            + (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
+         
          dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
          
@@ -864,17 +884,22 @@ covid<-function(t, Y, parameters,input)
          dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_vent)*QE - 
            nu_icuc*ICUC -(1-crit)*ICUC*1/2 +ageing%*%ICUC - mort*ICUC 
          dICUCVdt <- gamma*ihr[,2]*prob_icu*prob_vent*crit*E +gamma*ihr[,2]*prob_icu*prob_vent*crit*QE -nu_ventc*ICUCV +ageing%*%ICUCV - mort*ICUCV - (1-critV)*ICUCV*1/2
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE +(1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent 
+         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_vent*QE +(1-critV)*VentC*1/2
+                  +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent 
          dVentCdt <- gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_vent*(1-crit)*critV*QE - 
            (1-critV)*VentC*1/2 -nu_ventc*VentC +ageing%*%VentC - mort*VentC 
-         
          dCdt <- report*gamma*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-ihr[,2])*(E+QE)+ 
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)
-         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+ 
-           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC 
-         dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV
-         mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
+         dCMdt<- nus*pdeath_h*ifr[,2]*H + nusc*pdeath_hc*ifr[,2]*HC + nu_icu*pdeath_icu*ifr[,2]*ICU +nu_icuc*pdeath_icuc*ifr[,2]*ICUC +nu_vent*pdeath_vent*ifr[,2]*Vent +nu_ventc*pdeath_ventc*ifr[,2]*VentC
+              + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV
+              + mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC 
+         dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC + nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV
+              + mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
+
+# here
+
+         
          
          # return the rate of change
          list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt))
@@ -1104,14 +1129,44 @@ process_ode_outcome <- function(out){
 }
 
 
-out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+# out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+
+# Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+covidOdeCpp_reset()
+system.time(
+out0 <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters,
+            input=vectors0, A=A,
+            contact_home=contact_home, contact_school=contact_school,
+            contact_work=contact_work, contact_other=contact_other,
+            popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+            ageing=ageing,
+            ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+)
+
 simul_baseline <- process_ode_outcome(out0)
 # write.csv(simul_baseline, paste0(hilo,"_baseline_",gsub(":|-","",Sys.time()),".csv"))
 
 #future interventions
 #extend travel ban, quarantine, hand washing, cocooning the elderly until 1st July
 parameters2 <- parameters
-out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+
+# system.time(
+# out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+# )
+
+# Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+covidOdeCpp_reset()
+system.time(
+out <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters2,
+            input=vectors, A=A,
+            contact_home=contact_home, contact_school=contact_school,
+            contact_work=contact_work, contact_other=contact_other,
+            popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+            ageing=ageing,
+            ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+)
+
+
 simul_interventions <- process_ode_outcome(out)
 # write.csv(simul_interventions, paste0(hilo,"_futureIntv_",gsub(":|-","",Sys.time()),".csv"))
 
