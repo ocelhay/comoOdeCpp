@@ -1,5 +1,10 @@
 # comoOdeCpp
 
+RCpp version of CoMo Consortium's COVID-19 transmission model
+
+
+by Ricardo Aguas, Sompob Saralamba, Bo Gao
+
 
 ## Install
 
@@ -12,6 +17,16 @@ RStudio >> Tools >> Install Packages >> Install from: Package Archive File (.tar
 
 `install.packages("path_to_download/comoOdeCpp_13.8.1.tar.gz", repos = NULL, type="source")`
 
+
+- Using `devtools`
+
+```r
+
+install.packages("devtools")
+library("devtools")
+install_github("ATOME-MORU/comoOdeCpp", subdir="comoOdeCpp")
+
+```
 
 
 ## Usage:
