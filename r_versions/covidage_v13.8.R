@@ -1132,6 +1132,7 @@ process_ode_outcome <- function(out){
 # out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
 
 # Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+
 covidOdeCpp_reset()
 system.time(
 out0 <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters,
@@ -1155,6 +1156,7 @@ parameters2 <- parameters
 # )
 
 # Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+
 covidOdeCpp_reset()
 system.time(
 out <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters2,
