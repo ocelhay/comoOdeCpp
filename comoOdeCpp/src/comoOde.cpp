@@ -484,7 +484,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
 
 
         // Final transmission related parameters
-        arma::mat contacts = (1.0-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1.0+schoolclose*(1.0-school_eff)+workhome*(1.0-work_eff))*contact_home*(1.0-cocoon_mat);
+        arma::mat contacts = (1.0-cocoon)*cts+cocoon*cts%cocoon_mat+cocoon*(1.0+schoolclose*(1.0-school_eff)+workhome*(1.0-work_eff))*contact_home%(1.0-cocoon_mat);
         double seas = 1.0+amp*cos(2*3.14*(t-(phi*365.25/12.0))/365.25);
         double importation = mean_imports*(1.0-trvban_eff);
         
