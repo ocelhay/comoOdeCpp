@@ -51,6 +51,8 @@ void covidOdeCpp_print_timing() {
             << "duration_c=" << duration_c.count() << "\n";
 }
 
+bool ask_input = true;
+
 ////////////////////////////////////////////////////
 // Splinefun
 
@@ -93,6 +95,8 @@ void covidOdeCpp_reset() {
 
   is_initialised_splinefun = false;
   is_initialised_parameters = false;
+
+  ask_input = true;
 }
 
 // [[Rcpp::export]]
@@ -276,7 +280,19 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
   arma::vec CMC = y.subvec(21*A,22*A-1);
 
   arma::vec P = (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC);
-         
+  double Q = double((sum(QS)+sum(QE)+sum(QI)+sum(QC)+sum(QR)))/double(sum(P));
+
+// Environment base = Environment("package:base");
+// Function readline = base["readline"];
+// Function as_numeric = base["as.numeric"];
+
+// if (ask_input) {
+//   int drink = as<int>(as_numeric(readline("input: ")));
+//   if (drink == 4) {
+//     ask_input=false;
+//   }
+// }
+
 
 // duration_b += high_resolution_clock::now()-start_b;
 // auto start_c = high_resolution_clock::now();
@@ -332,7 +348,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
     // int lockdown_mid = (t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur));
     // int lockdown_high = (t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur));
 
-    int my_t = t*20+1;
+    int my_t = t*20;
 
     int isolation  = as<NumericVector>(input["isolation"])[my_t];
     int distancing = as<NumericVector>(input["distancing"])[my_t];
@@ -357,6 +373,8 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
     double vaccinate = 0.0;
     double trvban_eff = 0.0;
     double quarantine_rate = 0.0;
+    double rate_q = 0.0;
+
     double work;
     double vac_rate;
 
@@ -435,7 +453,8 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
              trvban_eff = travelban_eff;
            }
            if(quarantine){
-             quarantine_rate = std::min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC)*(household_size-1.0)/P),1.0)*quarantine_cov*quarantine_effort;
+             rate_q = std::min(std::min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))*(household_size-1.0)/sum(P),1.0) * quarantine_effort, quarantine_cov/2.0);
+             quarantine_rate = rate_q/(1.0+exp(-10.0*(quarantine_cov/2.0-Q)));
            }
          // }
 
@@ -465,7 +484,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
 
 
         // Final transmission related parameters
-        arma::mat contacts = (1.0-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1.0+schoolclose*(1.0-school_eff)+workhome*(1.0-work_eff))*contact_home*(1.0-cocoon_mat);
+        arma::mat contacts = (1.0-cocoon)*cts+cocoon*cts%cocoon_mat+cocoon*(1.0+schoolclose*(1.0-school_eff)+workhome*(1.0-work_eff))*contact_home%(1.0-cocoon_mat);
         double seas = 1.0+amp*cos(2*3.14*(t-(phi*365.25/12.0))/365.25);
         double importation = mean_imports*(1.0-trvban_eff);
         
@@ -474,7 +493,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
 
         arma::vec lam = (1.0-hand)*p*seas*(contacts*((rho*E+(I+CL+importation)+(1.0-selfis_eff)*(X+HHC)+rhos*(HH))/P))
                         + (1.0-hand)*p*seas*(1.0-quarantine*quarantine_eff_other)*(contact_other*((rho*QE+QI+QC)/P));
-        
+
                 // # contacts under home quarantine
         arma::vec lamq = (1.0-hand)*p*seas*((1.0-quarantine_eff_home)*contact_home*(((1.0-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))
                         + (1.0-hand)*p*seas*(1.0-quarantine_eff_other)*(contact_other*((rho*E+(I+CL+importation)+(1.0-selfis_eff)*(X+HHC+rho*QE+QI+QC)+rhos*(HH))/P));
@@ -493,7 +512,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       arma::vec dSdt = -S%lam-S*vaccinate+omega*R+ageing*S-mort_col%S+birth-quarantine_rate*S +(1.0/quarantine_days)*QS;
       arma::vec dEdt = S%lam-gamma*E+ageing*E-mort_col%E + (1.0-vaccine_eff)*(lam%V)-quarantine_rate*E+(1.0/quarantine_days)*QE;
       arma::vec dIdt = gamma*(1.0-pclin)*(1.0-screen_eff)*(1.0-ihr_col2)%E-nui*I+ageing*I-mort_col%I + (1.0/quarantine_days)*QI - quarantine_rate*I;
-      arma::vec dCLdt = gamma*pclin*(1.0-selfis)*(1.0-ihr_col2)%E-nui*CL+ageing*CL-mort_col%CL + (1.0/quarantine_days)*QC;
+      arma::vec dCLdt = gamma*pclin*(1.0-selfis)*(1.0-ihr_col2)*(1-quarantine_rate)%E-nui*CL+ageing*CL-mort_col%CL + (1.0/quarantine_days)*QC;
 
       arma::vec dRdt = nui*I-omega*R+nui*X+nui*CL+ageing*R-mort_col%R + (1.0/quarantine_days)*QR + nus*(1.0-pdeath_h*ifr_col2)%H
         + ((1.0-pdeath_icu*ifr_col2)*nu_icu)%ICU + ((1.0-pdeath_icuc*ifr_col2)*nu_icuc)%ICUC + ((1.0-pdeath_hc*ifr_col2)*nu_ventc)%ICUCV
@@ -506,7 +525,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       arma::vec dQSdt = quarantine_rate*S+ ageing*QS-mort_col%QS - (1.0/quarantine_days)*QS - lamq%QS;
       arma::vec dQEdt = quarantine_rate*E - gamma*QE + ageing*QE-mort_col%QE - (1.0/quarantine_days)*QE + lamq%QS; 
       arma::vec dQIdt = quarantine_rate*I + (gamma*(1.0-ihr_col2)*(1.0-pclin))%QE-nui*QI+ageing*QI-mort_col%QI - (1.0/quarantine_days)*QI;
-      arma::vec dQCdt = (gamma*(1.0-ihr_col2))%(pclin*QE)-nui*QC+ageing*QC-mort_col%QC - (1.0/quarantine_days)*QC;
+      arma::vec dQCdt = (gamma*pclin*(1-selfis)*(1-ihr_col2))*quarantine_rate%E + (gamma*(1.0-ihr_col2))%(pclin*QE)-nui*QC+ageing*QC-mort_col%QC - (1.0/quarantine_days)*QC;
       arma::vec dQRdt = nui*QI+nui*QC+ageing*QR-mort_col%QR - (1.0/quarantine_days)*QR;
          
 
