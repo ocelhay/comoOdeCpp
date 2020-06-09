@@ -348,7 +348,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
     // int lockdown_mid = (t>=lockdown_mid_on)*(t<=(lockdown_mid_on+lockdown_mid_dur));
     // int lockdown_high = (t>=lockdown_high_on)*(t<=(lockdown_high_on+lockdown_high_dur));
 
-    int my_t = t*20+1;
+    int my_t = t*20;
 
     int isolation  = as<NumericVector>(input["isolation"])[my_t];
     int distancing = as<NumericVector>(input["distancing"])[my_t];
