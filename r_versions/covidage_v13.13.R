@@ -1,32 +1,35 @@
-require("deSolve")
+rm(list = ls())
+
+library("deSolve")
 library("ggplot2")
 library("dplyr")
 library("reshape2")
-require(gridExtra)
-library(ggpubr)
-library(bsplus)
-library(deSolve)
-library(DT)
-library(highcharter)
-library(lubridate)
-library(pushbar)
+require("gridExtra")
+# library(ggpubr)
+# library(bsplus)
+# library(deSolve)
+# library(DT)
+# library(highcharter)
+# library(lubridate)
+# library(pushbar)
 library(readxl)
-library(reshape2)
-library(scales)
-library(shiny)
-library(shinyBS)
-library(shinycssloaders)
-library(shinyhelper)
-library(shinythemes)
-library(shinyWidgets)
-library(tidyverse)
-library(XLConnect)
-# library("comoOdeCpp")
+# library(reshape2)
+# library(scales)
+# library(shiny)
+# library(shinyBS)
+# library(shinycssloaders)
+# library(shinyhelper)
+# library(shinythemes)
+# library(shinyWidgets)
+# library(tidyverse)
+# library(XLConnect)
+library("comoOdeCpp")
 
 #read data from excel file
-setwd("C:/covid19/covid_age")
-load("data_CoMo.RData")
-file_path <- paste0(getwd(),"/Template_CoMoCOVID-19App_new.xlsx")  
+setwd("/home/bogao/Projects/como/comoOdeCpp")
+load("./data/data_CoMo.RData")
+file_path <- paste0(getwd(),"/data/Template_CoMoCOVID-19App_new.xlsx")
+# file_path <- paste0(getwd(),"/data/Template_CoMoCOVID-19App_new_1.xlsx")
 country_name<-"Cambodia"
 
 # Cases
@@ -330,7 +333,8 @@ initS<-popstruc[,2]-initE-initI-initR-initX-initV-initH-initHC-initQS-initQE-ini
 inp <- read_excel(file_path, sheet = "Interventions")
 inputs<-function(inp, run){
   # cap intervention end dates with simulation end date
-  inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  # inp$`Date End` = pmin(stopdate, inp$`Date End`)
+  inp$`Date End` = pmin(stopdate, as.Date(inp$`Date End`))
   
   tb<-which(inp$`Apply to`==run)
   
@@ -741,7 +745,21 @@ covid<-function(t, Y, parameters,input)
          CMC <- Y[CMCindex]
          P <- (S+E+I+R+X+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
          Q <- (sum(QS)+sum(QE)+sum(QI)+sum(QC)+sum(QR))/sum(P)
-         print(Q)
+         # print("Q")
+         
+         # print("this is Q:")
+         # print(Q)
+
+         # print("this is P:")
+         # print(P)
+
+         # print("this is I:")
+         # print(I)
+
+          # ii = readline("R-in:")
+          # if (ii == 4) {
+          #   pause(10)
+          # }
          
          # health system performance
          critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV)),1)
@@ -759,6 +777,7 @@ covid<-function(t, Y, parameters,input)
          travelban<-input$travelban[t*20+1]
          screen<-input$screen[t*20+1]
          quarantine<-input$quarantine[t*20+1]
+         
          lockdown_low<-input$lockdown_low[t*20+1]
          lockdown_mid<-input$lockdown_mid[t*20+1]
          lockdown_high<-input$lockdown_high[t*20+1]
@@ -782,10 +801,40 @@ covid<-function(t, Y, parameters,input)
          travelban_eff<-(input$tb_vector[t*20+1])/100
          vaccine_cov<-(input$vc_vector[t*20+1])/100
          quarantine_cov<-(input$q_vector[t*20+1])/100
-         
+
+# print("selfis_eff:")         
+# print(selfis_eff)
+# print("selfis_cov:")         
+# print(selfis_cov)
+# print("screen_contacts:")
+# print(screen_contacts)
+# print("school_eff:")
+# print(school_eff)
+# print("dist_cov:")
+# print(dist_cov)
+# print("hand_cov:")
+# print(hand_cov)
+# print("cocoon:")
+# print(cocoon)
+# print("work_cov:")
+# print(work_cov)
+# print("travelban_eff:")
+# print(travelban_eff)
+# print("vaccine_cov:")
+# print(vaccine_cov)
+# print("quarantine_cov:")
+# print(quarantine_cov)
+
+# print("t")
+# print(t)
+# print("t*20+1:")
+# print(t*20+1)
+
+
          if (workhome){
            work<-work_cov*work_eff
          }else{work<-1}
+
          if (isolation){
            selfis<-selfis_cov
            if(screen){
@@ -809,12 +858,23 @@ covid<-function(t, Y, parameters,input)
            trvban_eff<-travelban_eff
          }
          if(quarantine){
-           rate_q<-min((min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))*(household_size-1)/sum(P),1)*quarantine_effort),quarantine_cov/2)
+           rate_q<-min((min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))*(household_size-1)/sum(P),1)*quarantine_effort), quarantine_cov/2)
            quarantine_rate<-rate_q/(1+exp(-10*(quarantine_cov/2-Q)))
            # print(paste('Q',Q))
            # print(paste('rate',quarantine_rate))
-           # print(paste('rate_q',rate_q))
+          # print(paste('sum((I))',sum((I))))
+          # print(paste('sum((CL))',sum((CL))))
+          # print(paste('sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))',sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))))
+          # print(paste('quarantine_rate',quarantine_rate))
+          # print(paste('rate_q',rate_q))
+          # print(paste('screen_eff',screen_eff))
+          # ii = readline("R-in:")
+          # if (ii == 4) {
+          #   pause(10)
+          # }
          }
+          
+         # print("rate_q")
          
          
          # cocooning the elderly
@@ -833,6 +893,20 @@ covid<-function(t, Y, parameters,input)
          
          # Final transmission related parameters
          contacts <- (1-cocoon)*cts+cocoon*cts*cocoon_mat+cocoon*(1+schoolclose*(1-school_eff)+workhome*(1-work_eff))*contact_home*(1-cocoon_mat)
+
+# print(paste('t=', t, " t*20+1=", t*20+1))
+# print(paste('sum(sum(contacts))=', sum(sum(contacts))))
+# print(paste(' cocoon=', cocoon))
+# print(paste(' sum(sum(cts))=', sum(sum(cts)) ))
+# print(paste(' sum(sum(cocoon_mat))=', sum(sum(cocoon_mat)) ))
+# print(paste(' schoolclose=', schoolclose))
+# print(paste(' school_eff=', school_eff))
+# print(paste(' workhome=', workhome))
+# print(paste(' work_eff=', work_eff))
+# print(paste(' sum(sum(contact_home))=', sum(sum(contact_home)) ))
+
+
+
          seas <- 1+amp*cos(2*3.14*(t-(phi*365.25/12))/365.25)
          importation <- mean_imports*(1-trvban_eff)
          HH<-H+ICU+Vent+ICUC+ICUCV+VentC
@@ -848,11 +922,16 @@ covid<-function(t, Y, parameters,input)
          birth<-0*popbirth[,2]
          birth[1]<-b1
          
+
          # ODE system
          dSdt <- -S*lam-S*vaccinate+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
          dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
          dIdt <- gamma*(1-pclin)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I
+         
          dCLdt<- gamma*pclin*(1-selfis)*(1-ihr[,2])*(1-quarantine_rate)*E-nui*CL+ageing%*%CL-mort*CL + (1/quarantine_days)*QC
+
+# print(paste('sum(dCLdt)=',sum(dCLdt)))
+         
          dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/quarantine_days)*QR + nus*(1-pdeath_h*ifr[,2])*H + (1-pdeath_icu*ifr[,2])*nu_icu*ICU + (1-pdeath_icuc*ifr[,2])*nu_icuc*ICUC + (1-pdeath_ventc*ifr[,2])*nu_ventc*ICUCV + (1-pdeath_hc*ifr[,2])*nusc*HC + (1-pdeath_vent*ifr[,2])*nu_vent*Vent+ (1-pdeath_ventc*ifr[,2])*nu_ventc*VentC
          dXdt <- gamma*selfis*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
          dVdt <- vaccinate*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
@@ -860,7 +939,13 @@ covid<-function(t, Y, parameters,input)
          dQSdt <- quarantine_rate*S+ ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
          dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS 
          dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
-         dQCdt <- gamma*pclin*(1-selfis)*(1-ihr[,2])*quarantine_rate*E+gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
+         
+
+
+         dQCdt <- gamma*pclin*(1-selfis)*(1-ihr[,2])*quarantine_rate*E + gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
+         
+
+
          dQRdt <- nui*QI+nui*QC+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
          
          dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  
@@ -881,6 +966,9 @@ covid<-function(t, Y, parameters,input)
          dCMCdt <- nusc*pdeath_hc*ifr[,2]*HC+nu_icuc*pdeath_icuc*ifr[,2]*ICUC + nu_ventc*pdeath_ventc*ifr[,2]*VentC + nu_ventc*pdeath_ventc*ifr[,2]*ICUCV+
            mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
          
+
+         # print(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt))
+
          # return the rate of change
          list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt))
        }
@@ -1103,24 +1191,75 @@ process_ode_outcome <- function(out){
   return(results)
 }
 
-# covidOdeCpp_reset()
-# out <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters2,
-#            input=vectors, A=A,
-#            contact_home=contact_home, contact_school=contact_school,
-#            contact_work=contact_work, contact_other=contact_other,
-#            popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
-#            ageing=ageing,
-#            ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+stop("init complete")
 
-out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+use_cpp=TRUE
+
+if (use_cpp) {
+
+  # Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+
+covidOdeCpp_reset()
+system.time(
+out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters,
+            input=vectors0, A=A,
+            contact_home=contact_home, contact_school=contact_school,
+            contact_work=contact_work, contact_other=contact_other,
+            popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+            ageing=ageing,
+            ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+)
+
+} else {
+
+  system.time(
+  out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+  )
+}
+
+
 simul_baseline <- process_ode_outcome(out0)
+
 # # write.csv(simul_baseline, paste0(hilo,"_baseline_",gsub(":|-","",Sys.time()),".csv"))
 
 #future interventions
 #extend travel ban, quarantine, hand washing, cocooning the elderly until 1st July
+
 parameters2 <- parameters
-out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2,input=vectors)
+
+
+
+if (use_cpp) {
+  
+  # Rcpp::sourceCpp( './comoOdeCpp/src/comoOde.cpp')
+  
+  covidOdeCpp_reset()
+  system.time(
+    out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covidOdeCpp, parms = parameters2,
+                input=vectors, A=A,
+                contact_home=contact_home, contact_school=contact_school,
+                contact_work=contact_work, contact_other=contact_other,
+                popbirth_col2=popbirth[,2], popstruc_col2=popstruc[,2],
+                ageing=ageing,
+                ifr_col2=ifr[,2], ihr_col2=ihr[,2], mort_col=mort)
+  )
+
+} else {
+  system.time(
+  out <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters2, input=vectors)
+    
+  )
+}
+
+# system.time(
+#   out0 <- ode(y = Y, times = times, method = "euler", hini = 0.05, func = covid, parms = parameters, input=vectors0)
+# )
+
+# simul_baseline <- process_ode_outcome(out0)
+
+
 simul_interventions <- process_ode_outcome(out)
+
 # write.csv(simul_interventions, paste0(hilo,"_futureIntv_",gsub(":|-","",Sys.time()),".csv"))
 
 pop1<-out[,(Sindex+1)]+out[,(Eindex+1)]+out[,(Iindex+1)]+out[,(CLindex+1)]+out[,(Rindex+1)]+out[,(Xindex+1)]+out[,(Vindex+1)]+
@@ -1245,157 +1384,3 @@ grid.arrange(m0+ylab("Cumulatice mortality")+
                ggtitle("Intervention")+
                ylim(0, ymax),
              nrow = 1)
-
-
-
-# # Estimated basic reproduction number, R_t
-# par(mfrow=c(1,2))
-# ymax<-max(c(simul_baseline$Rt[!is.na(simul_baseline$Rt)],simul_interventions$Rt[!is.na(simul_interventions$Rt)]))
-# plot(time,simul_baseline$Rt,type='l',lwd=3,col='black',
-#      main="Baseline", xlab="Date", ylab="Reproduction number",ylim=c(0,ymax))
-# lines(time,simul_baseline$Rt/simul_baseline$Rt,lwd=2,col='grey')
-# plot(time,simul_interventions$Rt,type='l',lwd=3,col='black',
-#      main="Intervention", xlab="Date", ylab="Reproduction number",ylim=c(0,ymax))
-# lines(time,simul_interventions$Rt/simul_interventions$Rt,lwd=2,col='grey')
-#
-
-## Predicted ifr
-# ymax=max(c(simul_baseline$MORT1$value,simul_interventions$MORT1$value))
-# gm<-ggplot(data=simul_interventions$MORT1,aes(x=Age,y=value,fill=variable))+
-#   geom_line(data=simul_interventions$MORT1,aes(x=Age,y=value,colour=variable),lwd=1.5)+ylim(0,ymax)+ylab("Mortality")
-# gm0<-ggplot(data=simul_baseline$MORT1,aes(x=Age,y=value,fill=variable))+
-#   geom_line(data=simul_baseline$MORT1,aes(x=Age,y=value,colour=variable),lwd=1.5)+ylim(0,ymax)+ylab("Mortality")
-
-# grid.arrange(gm+theme_classic(),
-#              gm0+theme_classic(),
-#              nrow=1)
-
-
-# ## AGE DEPENDENT MORTALITY
-# cinc_mort_H1 <- parameters["nus"]*parameters["pdeath_h"]*(out[,(Hindex+1)])
-# cinc_mort_HC1 <- parameters["nusc"]*parameters["pdeath_hc"]*(out[,(HCindex+1)])
-# cinc_mort_ICU1 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out[,(ICUindex+1)]
-# cinc_mort_ICUC1 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out[,(ICUCindex+1)]
-# cinc_mort_Vent1 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out[,(Ventindex+1)]
-# cinc_mort_VentC1 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out[,(VentCindex+1)]
-# totage1<-as.data.frame(cinc_mort_H1+cinc_mort_HC1+cinc_mort_ICU1+cinc_mort_ICUC1+cinc_mort_Vent1+cinc_mort_VentC1)
-# basemort_H1<-(out[,(Hindex+1)])
-# basemort_HC1<-(out[,(HCindex+1)])
-# basemort_ICU1<-(out[,(ICUindex+1)])
-# basemort_ICUC1<-(out[,(ICUCindex+1)])
-# basemort_Vent1<-(out[,(Ventindex+1)])
-# basemort_VentC1<-(out[,(VentCindex+1)])
-# totbase1<-as.data.frame(basemort_H1+basemort_HC1+basemort_ICU1+basemort_ICUC1+basemort_Vent1+basemort_VentC1)
-# tc<-c()
-# ages<-seq(0,100,by=5)
-# for (i in 1:dim(cinc_mort_H1)[1]) {
-#   for (j in 1:dim(cinc_mort_H1)[2]) {
-#     tc<-rbind(tc,c(i,ages[j],totage1[i,j]*ifr[j,2]+totbase1[i,j]*mort[j]))
-#   }
-# }
-# tc<-as.data.frame(tc)
-# colnames(tc)<-c("Day","Age","value")
-# tc$Age<-as.factor(tc$Age)
-# p6<-ggplot(data=tc, aes(x=Day,y=value,fill=Age))+
-#   geom_bar(stat = "identity",position="fill", width=1)+
-#   ylab("Proportion of deaths")
-#
-# inc_mort_H0  <- parameters["nus"]*parameters["pdeath_h"]*(out0[,(Hindex+1)])
-# inc_mort_HC0 <- parameters["nusc"]*parameters["pdeath_hc"]*(out0[,(HCindex+1)])
-# inc_mort_ICU0 <- parameters["nu_icu"]*parameters["pdeath_icu"]*out0[,(ICUindex+1)]
-# inc_mort_ICUC0 <- parameters["nu_icuc"]*parameters["pdeath_icuc"]*out0[,(ICUCindex+1)]
-# inc_mort_Vent0 <- parameters["nu_vent"]*parameters["pdeath_vent"]*out0[,(Ventindex+1)]
-# inc_mort_VentC0 <- parameters["nu_ventc"]*parameters["pdeath_ventc"]*out0[,(VentCindex+1)]
-# totage0<-as.data.frame(inc_mort_H0+inc_mort_HC0+inc_mort_ICU0+inc_mort_ICUC0+inc_mort_Vent0+inc_mort_VentC0)
-# basemort_H0<-(out0[,(Hindex+1)])
-# basemort_HC0<-(out0[,(HCindex+1)])
-# basemort_ICU0<-(out0[,(ICUindex+1)])
-# basemort_ICUC0<-(out0[,(ICUCindex+1)])
-# basemort_Vent0<-(out0[,(Ventindex+1)])
-# basemort_VentC0<-(out0[,(VentCindex+1)])
-# totbase0<-as.data.frame(basemort_H0+basemort_HC0+basemort_ICU0+basemort_ICUC0+basemort_Vent0+basemort_VentC0)
-# tc0<-c()
-# for (i in 1:dim(cinc_mort_H1)[1]) {
-#   for (j in 1:dim(cinc_mort_H1)[2]) {
-#     tc0<-rbind(tc0,c(i,ages[j],totage0[i,j]*ifr[j,2]+totbase0[i,j]*mort[j]))
-#   }
-# }
-# tc0<-as.data.frame(tc0)
-# colnames(tc0)<-c("Day","Age","value")
-# tc0$Age<-as.factor(tc0$Age)
-# p16<-ggplot(data=tc0, aes(x=Day,y=value,fill=Age))+
-#   geom_bar(stat = "identity",position="fill", width=1)+ylab("Proportion of deaths")
-
-# grid.arrange(p16+theme_minimal(),
-#              p6+theme_minimal(),
-#              nrow=1)
-#
-
-
-#
-#
-#
-# #########################################################################################################################
-# #####   SUMMARY METRICS  ################################################################################################
-# #######################################################################################################################
-#
-# infected0<-tail((rowSums(out0[,(Rindex+1)])),1)/sum(popstruc[,2])
-# infected0
-# infected1<-tail((rowSums(out[,(Rindex+1)])),1)/sum(popstruc[,2])
-# infected1
-#
-# # #Population size checks
-# # tpop1
-# # tpop0
-#
-# # PCR
-# time_of_measurement<-40:49
-# # general population
-# (rowSums(out[time_of_measurement,Iindex+1])+rowSums(out[time_of_measurement,CLindex+1])+rowSums(out[time_of_measurement,QIindex+1])+
-#     rowSums(out[time_of_measurement,QCindex+1]))/sum(popstruc[,2])
-# # every infection including hospital infections
-# (rowSums(out[time_of_measurement,Iindex+1])+rowSums(out[time_of_measurement,CLindex+1])+rowSums(out[time_of_measurement,Hindex+1])+
-#     rowSums(out[time_of_measurement,ICUindex+1])+rowSums(out[time_of_measurement,Ventindex+1])+rowSums(out[time_of_measurement,HCindex+1])+
-#     rowSums(out[time_of_measurement,ICUCindex+1])+rowSums(out[time_of_measurement,VentCindex+1])+rowSums(out[time_of_measurement,QIindex+1])+
-#     rowSums(out[time_of_measurement,QCindex+1]))/sum(popstruc[,2])
-#
-# # SEROLOGY
-# tail((rowSums(out[,(Rindex+1)])),1)/sum(popstruc[,2])
-#
-# # IHR
-# sum(ihr$severe*popstruc[,2]/sum(popstruc[,2]))
-#
-#
-# # PORPORTIONAL MORTALITY IN THE ELDEST
-# m30<-out0[30,CMindex+1]/(out0[30,Cindex+1])
-# m30[is.infinite(m30)]<-0
-# m60<-out0[60,CMindex+1]/out0[60,Cindex+1]
-# m60[is.infinite(m60)]<-0
-# m90<-out0[90,CMindex+1]/out0[90,Cindex+1]
-# m90[is.infinite(m90)]<-0
-# m120<-out0[120,CMindex+1]/out0[120,Cindex+1]
-# m120[is.infinite(m120)]<-0
-#
-# ifr30<-sum(m30*popstruc[,2]/sum(popstruc[,2]),na.rm = T)
-# ifr60<-sum(m60*popstruc[,2]/sum(popstruc[,2]),na.rm = T)
-# ifr90<-sum(m90*popstruc[,2]/sum(popstruc[,2]),na.rm = T)
-# ifr120<-sum(m120*popstruc[,2]/sum(popstruc[,2]),na.rm = T)
-# cbind(ifr30,ifr60,ifr90,ifr120)*100
-#
-# PMORTDF0<-as.data.frame(cbind(out0[30,CMindex+1]/sum(out0[30,CMindex+1]),out0[60,CMindex+1]/sum(out0[60,CMindex+1]),
-#                               out0[90,CMindex+1]/sum(out0[90,CMindex+1]),out0[120,CMindex+1]/sum(out0[120,CMindex+1])))
-# PMORTDF<-as.data.frame(cbind(out[30,CMindex+1]/sum(out[30,CMindex+1]),out[60,CMindex+1]/sum(out[60,CMindex+1]),
-#                              out[90,CMindex+1]/sum(out[90,CMindex+1]),out[120,CMindex+1]/sum(out[120,CMindex+1])))
-# sum(PMORTDF0$V2[15:21])
-# sum(PMORTDF$V2[15:21])
-#
-#
-# # output doubling time over time first 7 days
-# dd<-7
-# doub0<-log(2)*dd/(log(dailyinc0[2+dd]/dailyinc0[2]))
-# doub0
-
-#
-#
-
-
