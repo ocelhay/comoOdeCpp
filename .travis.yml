@@ -1,4 +1,5 @@
 language: r
 r: 3.6.3
+cache: packages
 before_install:
   - cd comoOdeCpp
