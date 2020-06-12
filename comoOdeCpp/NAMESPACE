@@ -1,4 +1,3 @@
-importFrom(stats, splinefun)
-useDynLib(comoOdeCpp, .registration=TRUE)
+importFrom("stats", splinefun)
 importFrom(Rcpp, evalCpp)
 exportPattern("^[[:alpha:]]+")
