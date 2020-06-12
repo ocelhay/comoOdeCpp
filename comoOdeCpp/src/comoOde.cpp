@@ -78,6 +78,7 @@ void init_splinefun(
 
   is_initialised_splinefun=true;
   std::cout << "covidOdeCpp: splinefuns updated\n";
+  // std::cout << "sourceCpp version\n";
 }
 
 
@@ -299,13 +300,13 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       
 
 // health system performance
-   NumericVector f = {1,(1+give)/2,(1-give)/2,0};
+   NumericVector f = {1.0,(1.0+give)/2.0,(1.0-give)/2.0,0.0};
    double KH  = beds_available;
    double KICU = icu_beds_available + ventilators_available;
    double Kvent = ventilators_available;
-   NumericVector  xH = {0,(1+give)*KH/2,(3-give)*KH/2,2*KH};
-   NumericVector  xICU = {0,(1+give)*KICU/2,(3-give)*KICU/2,2*KICU};
-   NumericVector  xVent = {0,(1+give)*Kvent/2,(3-give)*Kvent/2,2*Kvent};
+   NumericVector  xH = {0.0,(1.0+give)*KH/2.0,(3.0-give)*KH/2.0,2.0*KH};
+   NumericVector  xICU = {0.0,(1.0+give)*KICU/2.0,(3.0-give)*KICU/2.0,2.0*KICU};
+   NumericVector  xVent = {0.0,(1.0+give)*Kvent/2.0,(3.0-give)*Kvent/2.0,2.0*Kvent};
 
    
    // double critH = std::min(1.0 - SplineFun(xH, f,sum(H)+sum(ICUC)+sum(ICUCV)),1.0);
@@ -485,7 +486,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
 
         // Final transmission related parameters
         arma::mat contacts = (1.0-cocoon)*cts+cocoon*cts%cocoon_mat+cocoon*(1.0+schoolclose*(1.0-school_eff)+workhome*(1.0-work_eff))*contact_home%(1.0-cocoon_mat);
-        double seas = 1.0+amp*cos(2*3.14*(t-(phi*365.25/12.0))/365.25);
+        double seas = 1.0+amp*cos(2.0*3.14*(t-(phi*365.25/12.0))/365.25);
         double importation = mean_imports*(1.0-trvban_eff);
         
         arma::vec HH = H+ICU+Vent+ICUC+ICUCV+VentC;
@@ -512,7 +513,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       arma::vec dSdt = -S%lam-S*vaccinate+omega*R+ageing*S-mort_col%S+birth-quarantine_rate*S +(1.0/quarantine_days)*QS;
       arma::vec dEdt = S%lam-gamma*E+ageing*E-mort_col%E + (1.0-vaccine_eff)*(lam%V)-quarantine_rate*E+(1.0/quarantine_days)*QE;
       arma::vec dIdt = gamma*(1.0-pclin)*(1.0-screen_eff)*(1.0-ihr_col2)%E-nui*I+ageing*I-mort_col%I + (1.0/quarantine_days)*QI - quarantine_rate*I;
-      arma::vec dCLdt = gamma*pclin*(1.0-selfis)*(1.0-ihr_col2)*(1-quarantine_rate)%E-nui*CL+ageing*CL-mort_col%CL + (1.0/quarantine_days)*QC;
+      arma::vec dCLdt = gamma*pclin*(1.0-selfis)*(1.0-ihr_col2)*(1.0-quarantine_rate)%E-nui*CL+ageing*CL-mort_col%CL + (1.0/quarantine_days)*QC;
 
       arma::vec dRdt = nui*I-omega*R+nui*X+nui*CL+ageing*R-mort_col%R + (1.0/quarantine_days)*QR + nus*(1.0-pdeath_h*ifr_col2)%H
         + ((1.0-pdeath_icu*ifr_col2)*nu_icu)%ICU + ((1.0-pdeath_icuc*ifr_col2)*nu_icuc)%ICUC + ((1.0-pdeath_hc*ifr_col2)*nu_ventc)%ICUCV
@@ -525,7 +526,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       arma::vec dQSdt = quarantine_rate*S+ ageing*QS-mort_col%QS - (1.0/quarantine_days)*QS - lamq%QS;
       arma::vec dQEdt = quarantine_rate*E - gamma*QE + ageing*QE-mort_col%QE - (1.0/quarantine_days)*QE + lamq%QS; 
       arma::vec dQIdt = quarantine_rate*I + (gamma*(1.0-ihr_col2)*(1.0-pclin))%QE-nui*QI+ageing*QI-mort_col%QI - (1.0/quarantine_days)*QI;
-      arma::vec dQCdt = (gamma*pclin*(1-selfis)*(1-ihr_col2))*quarantine_rate%E + (gamma*(1.0-ihr_col2))%(pclin*QE)-nui*QC+ageing*QC-mort_col%QC - (1.0/quarantine_days)*QC;
+      arma::vec dQCdt = (gamma*pclin*(1.0-selfis)*(1.0-ihr_col2))*quarantine_rate%E + (gamma*(1.0-ihr_col2))%(pclin*QE)-nui*QC+ageing*QC-mort_col%QC - (1.0/quarantine_days)*QC;
       arma::vec dQRdt = nui*QI+nui*QC+ageing*QR-mort_col%QR - (1.0/quarantine_days)*QR;
          
 
@@ -534,7 +535,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       arma::vec dICUdt = gamma*ihr_col2%(prob_icu*(1.0-crit)*(1.0-prob_vent)*E) + gamma*ihr_col2%(prob_icu*(1.0-crit)*(1.0-prob_vent)*QE) - nu_icu*ICU +ageing*ICU - mort_col%ICU +(1.0-crit)*ICUC*0.5;
       arma::vec dICUCdt = gamma*ihr_col2%(prob_icu*crit*(1.0-prob_vent)*E) + gamma*ihr_col2%(prob_icu*crit*(1.0-prob_vent)*QE)
                           - nu_icuc*ICUC - (1.0-crit)*ICUC*0.5 +ageing*ICUC - mort_col%ICUC;
-      arma::vec dICUCVdt = gamma*ihr_col2%(prob_icu*prob_vent*crit*E) +gamma*ihr_col2%(prob_icu*prob_vent*crit*QE) -nu_ventc*ICUCV +ageing*ICUCV - mort_col%ICUCV - (1-critV)*ICUCV*0.5;
+      arma::vec dICUCVdt = gamma*ihr_col2%(prob_icu*prob_vent*crit*E) +gamma*ihr_col2%(prob_icu*prob_vent*crit*QE) -nu_ventc*ICUCV +ageing*ICUCV - mort_col%ICUCV - (1.0-critV)*ICUCV*0.5;
       arma::vec dVentdt = gamma*ihr_col2%(prob_icu*(1.0-crit)*(1.0-critV)*prob_vent*E) + gamma*ihr_col2%(prob_icu*(1.0-crit)*(1.0-critV)*prob_vent*QE) + (1.0-critV)*VentC*1.0/2.0 
                           + (1.0-critV)*ICUCV*1.0/2.0 - nu_vent*Vent +ageing*Vent - mort_col%Vent ;
       arma::vec dVentCdt = gamma*ihr_col2%(prob_icu*prob_vent*(1.0-crit)*critV*E) +gamma*ihr_col2%(prob_icu*prob_vent*(1.0-crit)*critV*QE) 
