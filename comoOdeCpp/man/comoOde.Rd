@@ -40,7 +40,7 @@ covidOdeCpp_print_timing()
 }
 \examples{
 library("comoOdeCpp")
-covidTH_reset()
+covidOdeCpp_reset()
 # out0 <- ode(y = Y, times = times, func = covidOdeCpp, parms = parameters,
 #             input=vectors0, A=A,
 #             contact_home=contact_home, contact_school=contact_school,
