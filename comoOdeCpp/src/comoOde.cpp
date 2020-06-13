@@ -10,7 +10,7 @@
 #include <chrono>
 // #include "gperftools/profiler.h"
 
-#include <iostream>
+// #include <iostream>
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -46,9 +46,9 @@ std::chrono::duration<double> duration_a, duration_b, duration_c;
 
 // [[Rcpp::export]]
 void covidOdeCpp_print_timing() {
-  std::cout << "duration_a=" << duration_a.count() << "\n"
-            << "duration_b=" << duration_b.count() << "\n"
-            << "duration_c=" << duration_c.count() << "\n";
+  Rcout << "duration_a=" << duration_a.count() << "\n"
+        << "duration_b=" << duration_b.count() << "\n"
+        << "duration_c=" << duration_c.count() << "\n";
 }
 
 bool ask_input = true;
@@ -79,8 +79,8 @@ void init_splinefun(
   splinefun_Vent = sf(xVent, f, Named("method")="hyman");
 
   is_initialised_splinefun=true;
-  std::cout << "covidOdeCpp: splinefuns updated\n";
-  // std::cout << "sourceCpp version\n";
+  Rcout << "covidOdeCpp: splinefuns updated\n";
+  // Rcout << "sourceCpp version\n";
 }
 
 
@@ -132,7 +132,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         static double rhos = 0.0;
         static double amp = 0.0;
         static double phi = 0.0;
-        static double ihr_scaling = 0.0;
+        // static double ihr_scaling = 0.0;
         static double give = 0.0;
         static double pdeath_h = 0.0;
         static double pdeath_hc = 0.0;
@@ -198,7 +198,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         rhos = parameters["rhos"];
         amp = parameters["amp"];
         phi = parameters["phi"];
-        ihr_scaling = parameters["ihr_scaling"];
+        // ihr_scaling = parameters["ihr_scaling"];
         give = parameters["give"];
         pdeath_h = parameters["pdeath_h"];
         pdeath_hc = parameters["pdeath_hc"];
