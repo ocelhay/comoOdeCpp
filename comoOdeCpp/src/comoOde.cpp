@@ -14,7 +14,6 @@
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
-using namespace stats;
 
 using namespace std::chrono; 
 
@@ -58,14 +57,14 @@ bool ask_input = true;
 // Splinefun
 
 bool is_initialised_splinefun=false;
-Function splinefun("splinefun");
+Function sf("splinefun");
 
 NumericVector dummy_a = {1,2,3,4};
 NumericVector dummy_b = {1,2,3,4};
 
-Function splinefun_H = splinefun(dummy_a, dummy_b, Named("method")="hyman");
-Function splinefun_ICU = splinefun(dummy_a, dummy_b, Named("method")="hyman");
-Function splinefun_Vent = splinefun(dummy_a, dummy_b, Named("method")="hyman");
+Function splinefun_H = sf(dummy_a, dummy_b, Named("method")="hyman");
+Function splinefun_ICU = sf(dummy_a, dummy_b, Named("method")="hyman");
+Function splinefun_Vent = sf(dummy_a, dummy_b, Named("method")="hyman");
 
 void init_splinefun(
       NumericVector& xH,
@@ -73,9 +72,9 @@ void init_splinefun(
       NumericVector& xVent,
       NumericVector& f
     ) {
-  splinefun_H = splinefun(xH, f, Named("method")="hyman");
-  splinefun_ICU = splinefun(xICU, f, Named("method")="hyman");
-  splinefun_Vent = splinefun(xVent, f, Named("method")="hyman");
+  splinefun_H = sf(xH, f, Named("method")="hyman");
+  splinefun_ICU = sf(xICU, f, Named("method")="hyman");
+  splinefun_Vent = sf(xVent, f, Named("method")="hyman");
 
   is_initialised_splinefun=true;
   std::cout << "covidOdeCpp: splinefuns updated\n";
