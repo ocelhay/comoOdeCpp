@@ -10,7 +10,7 @@
 #include <chrono>
 // #include "gperftools/profiler.h"
 
-#include <iostream>
+// #include <iostream>
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
@@ -46,9 +46,9 @@ std::chrono::duration<double> duration_a, duration_b, duration_c;
 
 // [[Rcpp::export]]
 void covidOdeCpp_print_timing() {
-  std::cout << "duration_a=" << duration_a.count() << "\n"
-            << "duration_b=" << duration_b.count() << "\n"
-            << "duration_c=" << duration_c.count() << "\n";
+  Rcout << "duration_a=" << duration_a.count() << "\n"
+        << "duration_b=" << duration_b.count() << "\n"
+        << "duration_c=" << duration_c.count() << "\n";
 }
 
 bool ask_input = true;
@@ -79,8 +79,8 @@ void init_splinefun(
   splinefun_Vent = sf(xVent, f, Named("method")="hyman");
 
   is_initialised_splinefun=true;
-  std::cout << "covidOdeCpp: splinefuns updated\n";
-  // std::cout << "sourceCpp version\n";
+  Rcout << "covidOdeCpp: splinefuns updated\n";
+  // Rcout << "sourceCpp version\n";
 }
 
 
