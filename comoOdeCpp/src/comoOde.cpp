@@ -110,7 +110,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
              const arma::vec& popbirth_col2, const arma::vec& popstruc_col2,
              const arma::mat& ageing,
              const arma::vec& ifr_col2, const arma::vec& ihr_col2, const arma::vec& mort_col ){
-    
     //Rf_PrintValue(parameters);
 
 // auto start_a = high_resolution_clock::now();
@@ -184,7 +183,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         static double household_size = 0.0;
 
     if (!is_initialised_parameters) {
-
         p = parameters["p"];
         rho = parameters["rho"];
         omega = parameters["omega"];
@@ -251,7 +249,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         household_size = parameters["household_size"];
 
         is_initialised_parameters=true;
-
     }
     
   // int A = 21; 
@@ -582,5 +579,4 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
 // duration_c += high_resolution_clock::now()-start_c;
 
   return output;
-
 }
