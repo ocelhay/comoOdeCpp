@@ -3,6 +3,8 @@
 [![GitHub release](https://img.shields.io/github/v/release/ocelhay/comoOdeCpp.svg)](https://GitHub.com/ocelhay/comoOdeCpp/releases/)
 [![Build Status](https://travis-ci.org/ocelhay/comoOdeCpp.svg?branch=master)](https://travis-ci.org/ocelhay/comoOdeCpp)
 ![Maintenance](https://img.shields.io/maintenance/yes/2020)
+[![CodeFactor](https://www.codefactor.io/repository/github/ocelhay/comoodecpp/badge)](https://www.codefactor.io/repository/github/ocelhay/comoodecpp)
+
 
 This package implements CoMo Consortium's COVID-19 transmission model in Rcpp. It is designed to work with [CoMo COVID-19 app](https://github.com/ocelhay/como) 
 
