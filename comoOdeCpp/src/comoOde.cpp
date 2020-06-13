@@ -57,7 +57,9 @@ bool ask_input = true;
 // Splinefun
 
 bool is_initialised_splinefun=false;
-Function sf("splinefun");
+Environment pkg_stats = Environment::namespace_env("stats");
+Function sf=pkg_stats["splinefun"];
+// Function sf("splinefun");
 
 NumericVector dummy_a = {1,2,3,4};
 NumericVector dummy_b = {1,2,3,4};
