@@ -14,6 +14,7 @@
 
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
+using namespace stats;
 
 using namespace std::chrono; 
 

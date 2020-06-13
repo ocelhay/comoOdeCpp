@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 covidOdeCpp_print_timing <- function() {
-    invisible(.Call('_comoOdeCpp_covidOdeCpp_print_timing', PACKAGE = 'comoOdeCpp'))
+    invisible(.Call(`_comoOdeCpp_covidOdeCpp_print_timing`))
 }
 
 covidOdeCpp_reset <- function() {
-    invisible(.Call('_comoOdeCpp_covidOdeCpp_reset', PACKAGE = 'comoOdeCpp'))
+    invisible(.Call(`_comoOdeCpp_covidOdeCpp_reset`))
 }
 
 covidOdeCpp <- function(t, y, parameters, input, A, contact_home, contact_school, contact_work, contact_other, popbirth_col2, popstruc_col2, ageing, ifr_col2, ihr_col2, mort_col) {
-    .Call('_comoOdeCpp_covidOdeCpp', PACKAGE = 'comoOdeCpp', t, y, parameters, input, A, contact_home, contact_school, contact_work, contact_other, popbirth_col2, popstruc_col2, ageing, ifr_col2, ihr_col2, mort_col)
+    .Call(`_comoOdeCpp_covidOdeCpp`, t, y, parameters, input, A, contact_home, contact_school, contact_work, contact_other, popbirth_col2, popstruc_col2, ageing, ifr_col2, ihr_col2, mort_col)
 }
 
