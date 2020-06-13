@@ -132,7 +132,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         static double rhos = 0.0;
         static double amp = 0.0;
         static double phi = 0.0;
-        static double ihr_scaling = 0.0;
+        // static double ihr_scaling = 0.0;
         static double give = 0.0;
         static double pdeath_h = 0.0;
         static double pdeath_hc = 0.0;
@@ -198,7 +198,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         rhos = parameters["rhos"];
         amp = parameters["amp"];
         phi = parameters["phi"];
-        ihr_scaling = parameters["ihr_scaling"];
+        // ihr_scaling = parameters["ihr_scaling"];
         give = parameters["give"];
         pdeath_h = parameters["pdeath_h"];
         pdeath_hc = parameters["pdeath_hc"];
