@@ -4,4 +4,7 @@
 .Ruserdata
 *.tar.gz
 *.Rproj
-data/.~*
+.~*
+*.o
+*.so
+*.Rcheck
