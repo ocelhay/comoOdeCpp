@@ -12,5 +12,8 @@ Depends:
 Imports:
 	Rcpp (>= 1.0.4.6)
 Suggests:
-	testthat
+	testthat,
+	deSolve,
+	dplyr,
+	readxl
 LinkingTo: Rcpp, RcppArmadillo
