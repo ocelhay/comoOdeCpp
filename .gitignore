@@ -5,3 +5,6 @@
 *.tar.gz
 *.Rproj
 .~*
+*.o
+*.so
+*.Rcheck
