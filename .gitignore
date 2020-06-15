@@ -4,4 +4,4 @@
 .Ruserdata
 *.tar.gz
 *.Rproj
-data/.~*
+.~*
