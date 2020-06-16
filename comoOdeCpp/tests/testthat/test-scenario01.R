@@ -12,7 +12,7 @@ check_libraries <- function() {
   }
 }
 
-test_that("scenario01 baseline", {
+test_that("scenario01 baseline matching", {
   check_libraries()
   rm(list = ls())
 
@@ -40,15 +40,18 @@ test_that("scenario01 baseline", {
     parameters["p"] <- pp
 
     covidOdeCpp_reset()
-    out_cpp <- ode(y = Y, times = times, method = "euler", hini = 0.05,
-                func = covidOdeCpp, parms = parameters,
-                input = vectors0, A = A,
-                contact_home = contact_home, contact_school = contact_school,
-                contact_work = contact_work, contact_other = contact_other,
-                popbirth_col2 = popbirth[, 2], popstruc_col2 = popstruc[, 2],
-                ageing = ageing,
-                ifr_col2 = ifr[, 2], ihr_col2 = ihr[, 2], mort_col = mort
-                )
+    output_message <- capture_output(
+      out_cpp <- ode(y = Y, times = times, method = "euler", hini = 0.05,
+                  func = covidOdeCpp, parms = parameters,
+                  input = vectors0, A = A,
+                  contact_home = contact_home, contact_school = contact_school,
+                  contact_work = contact_work, contact_other = contact_other,
+                  popbirth_col2 = popbirth[, 2], popstruc_col2 = popstruc[, 2],
+                  ageing = ageing,
+                  ifr_col2 = ifr[, 2], ihr_col2 = ihr[, 2], mort_col = mort
+                  )
+      )
+    expect_equal(output_message, "covidOdeCpp: splinefuns updated")
 
     out_r <- ode(y = Y, times = times, method = "euler", hini = 0.05,
                 func = covid, parms = parameters, input = vectors0
@@ -58,7 +61,9 @@ test_that("scenario01 baseline", {
   }
 })
 
-
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("performance messages prints", {
+  expect_equal(
+    capture_output(covidOdeCpp_print_timing()),
+    "duration_a=0\nduration_b=0\nduration_c=0"
+  )
 })
