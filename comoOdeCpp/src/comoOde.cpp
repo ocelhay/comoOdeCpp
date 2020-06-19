@@ -299,18 +299,22 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
       
 
 // health system performance
-   NumericVector f = {1.0,(1.0+give)/2.0,(1.0-give)/2.0,0.0};
-   double KH  = beds_available;
-   double KICU = icu_beds_available + ventilators_available;
-   double Kvent = ventilators_available;
-   NumericVector  xH = {0.0,(1.0+give)*KH/2.0,(3.0-give)*KH/2.0,2.0*KH};
-   NumericVector  xICU = {0.0,(1.0+give)*KICU/2.0,(3.0-give)*KICU/2.0,2.0*KICU};
-   NumericVector  xVent = {0.0,(1.0+give)*Kvent/2.0,(3.0-give)*Kvent/2.0,2.0*Kvent};
+    if (!is_initialised_splinefun) {
+      NumericVector f = {1.0,(1.0+give)/2.0,(1.0-give)/2.0,0.0};
+      double KH  = beds_available;
+      double KICU = icu_beds_available + ventilators_available;
+      double Kvent = ventilators_available;
+      NumericVector  xH = {0.0,(1.0+give)*KH/2.0,(3.0-give)*KH/2.0,2.0*KH};
+      NumericVector  xICU = {0.0,(1.0+give)*KICU/2.0,(3.0-give)*KICU/2.0,2.0*KICU};
+      NumericVector  xVent = {0.0,(1.0+give)*Kvent/2.0,(3.0-give)*Kvent/2.0,2.0*Kvent};
 
    
    // double critH = std::min(1.0 - SplineFun(xH, f,sum(H)+sum(ICUC)+sum(ICUCV)),1.0);
    // double crit = std::min(1.0-SplineFun(xICU, f,sum(ICU)+sum(Vent)+sum(VentC)),1.0);
    // double critV = std::min(1.0-SplineFun(xVent, f,sum(Vent)),1.0);
+
+      init_splinefun(xH, xICU, xVent, f);
+    }
 
    double sum_H=sum(H);
    double sum_ICUC=sum(ICUC);
@@ -320,11 +324,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
    double sum_VentC=sum(VentC);
 
     
-    if (!is_initialised_splinefun) {
-      init_splinefun(xH, xICU, xVent, f);
-    }
-
-
    // double critH = std::min(1.0 - SplineFun(xH, f,sum_H+sum_ICUC+sum_ICUCV),1.0);
    // double crit = std::min(1.0-SplineFun(xICU, f,sum_ICU+sum_Vent+sum_VentC),1.0);
    // double critV = std::min(1.0-SplineFun(xVent, f,sum_Vent),1.0);
