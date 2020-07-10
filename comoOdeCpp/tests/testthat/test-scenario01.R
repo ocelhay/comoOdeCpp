@@ -47,14 +47,20 @@ test_that("scenario01 baseline matching", {
 
       covidOdeCpp_reset()
       output_message <- capture_output(
-        out_cpp <- ode(y = Y, times = times, method = "euler", hini = 0.05,
+        out_cpp <- ode(
+                    y = Y, times = times, method = "euler", hini = 0.05,
                     func = covidOdeCpp, parms = parameters,
                     input = ss, A = A,
-                    contact_home = contact_home, contact_school = contact_school,
-                    contact_work = contact_work, contact_other = contact_other,
-                    popbirth_col2 = popbirth[, 2], popstruc_col2 = popstruc[, 2],
+                    contact_home = contact_home,
+                    contact_school = contact_school,
+                    contact_work = contact_work,
+                    contact_other = contact_other,
+                    popbirth_col2 = popbirth[, 2],
+                    popstruc_col2 = popstruc[, 2],
                     ageing = ageing,
-                    ifr_col2 = ifr[, 2], ihr_col2 = ihr[, 2], mort_col = mort
+                    ifr_col2 = ifr[, 2],
+                    ihr_col2 = ihr[, 2],
+                    mort_col = mort
                     )
         )
       expect_equal(output_message, "covidOdeCpp: splinefuns updated")
@@ -64,7 +70,7 @@ test_that("scenario01 baseline matching", {
                   )
 
       expect_equal(out_cpp, out_r)
-    } 
+    }
   }
 
 })
