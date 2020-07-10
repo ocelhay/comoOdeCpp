@@ -12,7 +12,7 @@ check_libraries <- function() {
   }
 }
 
-test_that("scenario01 baseline matching", {
+test_that("Matching Rcpp and R version at low p value", {
   check_libraries()
   rm(list = ls())
 
@@ -37,8 +37,8 @@ test_that("scenario01 baseline matching", {
   )
 
   scenario_list <- list(
-    vectors0,
-    vectors
+    vectors0, # Baseline
+    vectors   # Hypothetical
   )
 
   for (ss in scenario_list) {
