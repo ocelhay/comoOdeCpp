@@ -12,7 +12,7 @@ check_libraries <- function() {
   }
 }
 
-test_that("Matching Rcpp and R version at low p value", {
+test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   check_libraries()
   rm(list = ls())
 
@@ -22,19 +22,13 @@ test_that("Matching Rcpp and R version at low p value", {
   library("comoOdeCpp")
 
   load("data/data_CoMo.RData")
-  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_1.xlsx")
+  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_14.4.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v13.13.core.R"), local = environment())
+    source(paste0(getwd(), "/v14.4.core.R"), local = environment())
   }
 
-  p_value_list <- list(
-    0.00,
-    0.01,
-    0.02,
-    0.03,
-    0.035
-  )
+  p_value_list = seq(0.0, 0.1, by = 0.01)
 
   scenario_list <- list(
     vectors0, # Baseline
@@ -45,11 +39,19 @@ test_that("Matching Rcpp and R version at low p value", {
     for (pp in p_value_list) {
       parameters["p"] <- pp
 
+      param_vector <- parameters
+      param_vector[parameters_noise] <- parameters[parameters_noise]
+        + rnorm(
+            length(parameters_noise),
+            mean = 0,
+            sd = noise*abs(parameters[parameters_noise])
+          )
+
       covidOdeCpp_reset()
       output_message <- capture_output(
         out_cpp <- ode(
                     y = Y, times = times, method = "euler", hini = 0.05,
-                    func = covidOdeCpp, parms = parameters,
+                    func = covidOdeCpp, parms = param_vector,
                     input = ss, A = A,
                     contact_home = contact_home,
                     contact_school = contact_school,
@@ -65,11 +67,23 @@ test_that("Matching Rcpp and R version at low p value", {
         )
       expect_equal(output_message, "covidOdeCpp: splinefuns updated")
 
-      out_r <- ode(y = Y, times = times, method = "euler", hini = 0.05,
-                  func = covid, parms = parameters, input = ss
-                  )
+      out_r <- ode(
+                y = Y, times = times, method = "euler", hini = 0.05,
+                func = covid, parms = param_vector, input = ss
+                )
 
-      expect_equal(out_cpp, out_r)
+      for (ii in 1:1000) {
+        rr = sample(1:nrow(out_r),1)
+        cc = sample(1:ncol(out_r),1)
+        expect_equal(
+          out_cpp[rr,cc],
+          out_r[rr,cc],
+          tolerance = 0.05,
+          scale = out_r[rr,cc]
+        )
+      }
+
+      # expect_equal(out_cpp, out_r)
     }
   }
 
