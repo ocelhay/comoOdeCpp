@@ -370,7 +370,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
     // int lockdown_low  = as<NumericVector>(input["lockdown_low"])[my_t];
     // int lockdown_mid  = as<NumericVector>(input["lockdown_mid"])[my_t];
     // int lockdown_high = as<NumericVector>(input["lockdown_high"])[my_t];
-    int masstesting = as<NumericVector>(input["masstesting"])[my_t];
+    // int masstesting = as<NumericVector>(input["masstesting"])[my_t];
 
 
     double screen_eff = 0.0;
