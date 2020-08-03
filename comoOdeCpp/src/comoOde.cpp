@@ -117,20 +117,27 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         ////////////////////////////////////////////////////
         // Parameters
 
-        static double p = 0.0;
+        // Ones selected for fitting
+        double p = parameters["p"];
+        double reporth = parameters["reporth"];
+        double amp = parameters["amp"];
+
+        // 
+
+        // static double p = 0.0;
         static double rho = 0.0;
         static double omega = 0.0;
         static double gamma = 0.0;
         static double nui = 0.0;
         static double report = 0.0;
         static double reportc = 0.0;
-        static double reporth = 0.0;
+        // static double reporth = 0.0;
         static double beds_available = 0.0;
         static double icu_beds_available = 0.0;
         static double ventilators_available = 0.0;
         static double nus = 0.0;
         static double rhos = 0.0;
-        static double amp = 0.0;
+        // static double amp = 0.0;
         static double phi = 0.0;
         // static double ihr_scaling = 0.0;
         static double give = 0.0;
@@ -186,20 +193,20 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         static double isolation_days = 0.0;
 
     if (!is_initialised_parameters) {
-        p = parameters["p"];
+        // p = parameters["p"];
         rho = parameters["rho"];
         omega = parameters["omega"];
         gamma = parameters["gamma"];
         nui = parameters["nui"];
         report = parameters["report"];
         reportc = parameters["reportc"];
-        reporth = parameters["reporth"];
+        // reporth = parameters["reporth"];
         beds_available = parameters["beds_available"];
         icu_beds_available = parameters["icu_beds_available"];
         ventilators_available = parameters["ventilators_available"];
         nus = parameters["nus"];
         rhos = parameters["rhos"];
-        amp = parameters["amp"];
+        // amp = parameters["amp"];
         phi = parameters["phi"];
         // ihr_scaling = parameters["ihr_scaling"];
         give = parameters["give"];
