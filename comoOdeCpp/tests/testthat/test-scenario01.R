@@ -22,10 +22,10 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   library("comoOdeCpp")
 
   load("data/data_CoMo.RData")
-  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_14.4.xlsx")
+  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_v15.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v14.4.core.R"), local = environment())
+    source(paste0(getwd(), "/v15.1.core.R"), local = environment())
   }
 
   p_value_list = seq(0.0, 0.1, by = 0.01)
@@ -34,6 +34,8 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
     vectors0, # Baseline
     vectors   # Hypothetical
   )
+
+  # sss = 0
 
   for (ss in scenario_list) {
     for (pp in p_value_list) {
@@ -72,13 +74,17 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
                 func = covid, parms = param_vector, input = ss
                 )
 
+      # sss = sss + 1
+      # write.csv(out_cpp, paste0("out_cpp_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
+      # write.csv(out_r, paste0("out_r_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
+
       for (ii in 1:1000) {
         rr = sample(1:nrow(out_r),1)
         cc = sample(1:ncol(out_r),1)
         expect_equal(
           out_cpp[rr,cc],
           out_r[rr,cc],
-          tolerance = 0.05,
+          tolerance = 0.03,
           scale = out_r[rr,cc]
         )
       }
