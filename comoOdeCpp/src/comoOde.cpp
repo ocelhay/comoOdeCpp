@@ -570,11 +570,13 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
         arma::vec HH = H+ICU+Vent+ICUC+ICUCV+VentC;
         arma::vec HHC = HC;
 
-        arma::vec lam = (1.0-hand*mask)*p*seas*(contacts*((rho*E+(I+CL+importation)+(1.0-selfis_eff)*(X+HHC)+rhos*(HH))/P))
+        // std::cout << "std::max(hand,mask)=" << std::max(hand,mask) << "\n";
+
+        arma::vec lam = (1.0-std::max(hand,mask))*p*seas*(contacts*((rho*E+(I+CL+importation)+(1.0-selfis_eff)*(X+HHC)+rhos*(HH))/P))
                         + (1.0-hand)*p*seas*(1.0-quarantine*quarantine_eff_other)*(contact_other*((rho*QE+QI+QC)/P));
 
                 // # contacts under home quarantine
-        arma::vec lamq = (1.0-hand*mask)*p*seas*((1.0-quarantine_eff_home)*contact_home*(((1.0-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))
+        arma::vec lamq = (1.0-std::max(hand,mask))*p*seas*((1.0-quarantine_eff_home)*contact_home*(((1.0-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))
                         + (1.0-hand)*p*seas*(1.0-quarantine_eff_other)*(contact_other*((rho*E+(I+CL+importation)+(1.0-selfis_eff)*(X+HHC+rho*QE+QI+QC)+rhos*(HH))/P));
          
         // # birth/death

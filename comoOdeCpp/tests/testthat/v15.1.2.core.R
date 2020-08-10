@@ -265,6 +265,7 @@ parameters["amp"]<-parameters["amp"]/100
 parameters["selfis_eff"]<-parameters["selfis_eff"]/100
 parameters["dist_eff"]<-parameters["dist_eff"]/100
 parameters["hand_eff"]<-parameters["hand_eff"]/100
+parameters["mask_eff"]<-parameters["mask_eff"]/100
 parameters["work_eff"]<-parameters["work_eff"]/100
 parameters["w2h"]<-parameters["w2h"]/100
 parameters["school_eff"]<-parameters["school_eff"]/100
@@ -1101,10 +1102,10 @@ covid<-function(t, Y, parameters,input)
          importation <- mean_imports*(1-trvban_eff)
          HH<-H+ICU+Vent+ICUC+ICUCV+VentC
          HHC<-HC
-         lam <- (1-max(hand*mask))*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))+
+         lam <- (1-max(hand,mask))*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))+
            (1-hand)*p*seas*(1-quarantine*quarantine_eff_other)*(contact_other%*%((rho*QE+QI+QC)/P))
          # contacts under home quarantine
-         lamq<-(1-max(hand*mask))*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))+
+         lamq<-(1-max(hand,mask))*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))+
            (1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC+rho*QE+QI+QC)+rhos*(HH))/P))
          
          # birth/death
