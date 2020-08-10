@@ -454,53 +454,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
     }
 
 
-    // Rcout << "min_age_testing=" << min_age_testing << "\n";
-    // Rcout << "max_age_testing=" << max_age_testing << "\n";
-    // Rcout << "min_age_vaccine=" << min_age_vaccine << "\n";
-
-    // age_testing_vector.print("age_testing_vector");
-    // age_vaccine_vector.print("age_vaccine_vector");
-
-// c(rep(0,min_age_testing-1),rep(1,max_age_testing-min_age_testing+1),rep(0,21-max_age_testing));
-// c(rep(0,min_age_vaccine-1),rep(1,21-min_age_vaccine));
-
-
-// if (lockdown_low || lockdown_mid || lockdown_high){
-//            if(lockdown_low){
-//              selfis = 0.5;
-//              dist = 0.25;
-//              school = 0.0;
-//              trvban_eff = 0.0;
-//              quarantine_rate = 0.0;
-//              work = 0.0;
-//              cocoon = 0.95;
-//              hand = 0.05;
-//              vaccinate = 0.0;
-//            }
-//            if(lockdown_mid){
-//              selfis = 0.5;
-//              dist = 0.35;
-//              school = 0.85;
-//              trvban_eff = 0.0;
-//              quarantine_rate = 0.05;
-//              work = 0.5;
-//              cocoon= 0.95;
-//              hand = 0.05;
-//              vaccinate = 0.0;
-//            }
-//            if(lockdown_high){
-//              selfis = 0.95;
-//              dist = 0.95;
-//              school = 0.85;
-//              trvban_eff = 0.95;
-//              quarantine_rate = 0.9;
-//              work = 0.75;
-//              cocoon = 0.95;
-//              hand = 0.075;
-//              vaccinate= 0.0;
-//            }
-//          }
-//          else{
            if (workhome){
              work = work_cov*work_eff;
            }else{work = 1.0;}
@@ -556,7 +509,6 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
               dexvc = 1.0;
            }
 
-         // }
 
         // testing rates
         double sum_I = sum(I);
