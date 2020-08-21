@@ -657,7 +657,8 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%VentC
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV
                         + mort_col%H + mort_col%HC + mort_col%ICU + mort_col%ICUC + mort_col%Vent + mort_col%VentC
-                        + mort_col%Z;
+                        + mort_col%Z
+                        + mort_col%V;
 
       arma::vec dCMCdt = nusc*propo2*pdeath_hco*ifr_col2%HC
                           + nusc*(1.0-propo2)*pdeath_hc*ifr_col2%HC
@@ -665,7 +666,8 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                           + nu_icuc*(1.0-propo2)*pdeath_icuc*ifr_col2%ICUC
                           + nu_ventc*dexvc*pdeath_ventc*ifr_col2%VentC
                           + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV
-                          + mort_col%HC + mort_col%ICUC + mort_col%VentC + mort_col%ICUCV;
+                          + mort_col%HC + mort_col%ICUC + mort_col%VentC + mort_col%ICUCV
+                          + mort_col%V;
 
       arma::vec dZdt = gamma*ratetestE*age_testing_vector%(1.0-ihr_col2)%E
                         + ratetestI*age_testing_vector%I

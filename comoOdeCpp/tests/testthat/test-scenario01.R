@@ -25,7 +25,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_v15.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v15.2.core.R"), local = environment())
+    source(paste0(getwd(), "/v15.3.core.R"), local = environment())
   }
 
   p_value_list = seq(0.0, 0.1, by = 0.01)
