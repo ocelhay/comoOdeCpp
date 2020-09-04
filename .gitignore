@@ -9,4 +9,3 @@
 *.so
 *.Rcheck
 temp_out/
-.DS_Store
