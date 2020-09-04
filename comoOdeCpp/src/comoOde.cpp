@@ -655,10 +655,19 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                         + nu_icuc*(1.0-propo2)*pdeath_icuc*ifr_col2%ICUC
                         + nu_vent*dexv*pdeath_vent*ifr_col2%Vent
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%VentC
-                        + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV
+                        + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV // all above are attributable deaths
                         + mort_col%H + mort_col%HC + mort_col%ICU + mort_col%ICUC + mort_col%Vent + mort_col%VentC
-                        + mort_col%Z
-                        + mort_col%V;
+                        + mort_col%ICUCV //!to add
+                        + mort_col%Z // ?to remove, mass tested infected
+                        + mort_col%V ; // ?to remove
+
+// reportable = attributable + mort_col%(!not reportable)
+
+//attributable = coloured
+//mort_col%(!not reportable) lighter grey
+
+//mort_col%(not reportable) darker grey, S, E, QS, QE, R, QR, V
+
 
       arma::vec dCMCdt = nusc*propo2*pdeath_hco*ifr_col2%HC
                           + nusc*(1.0-propo2)*pdeath_hc*ifr_col2%HC
@@ -673,7 +682,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                         + ratetestI*age_testing_vector%I
                         + ratetestC*age_testing_vector%CL
                         - (1.0/isolation_days)*Z
-                        - mort_col%Z;
+                        - mort_col%Z; // reportable death
 
   arma::vec outvec = dSdt;
   outvec = arma::join_cols(outvec,dEdt);
