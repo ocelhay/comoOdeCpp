@@ -8,7 +8,8 @@
 
 
 
-This package implements CoMo Consortium's COVID-19 transmission model in Rcpp. It is designed to work with [CoMo COVID-19 app](https://github.com/ocelhay/como) 
+This package implements CoMo Consortium's COVID-19 transmission model in Rcpp.
+comoOdeCpp is designed to work with [CoMo COVID-19 app](https://github.com/ocelhay/como) 
 
 
 by Ricardo Aguas, Sompob Saralamba, Bo Gao
