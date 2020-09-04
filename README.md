@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/ocelhay/comoOdeCpp.svg?branch=master)](https://travis-ci.org/ocelhay/comoOdeCpp)
 ![Maintenance](https://img.shields.io/maintenance/yes/2020)
 [![CodeFactor](https://www.codefactor.io/repository/github/ocelhay/comoodecpp/badge)](https://www.codefactor.io/repository/github/ocelhay/comoodecpp)
-[![Codecov](https://img.shields.io/codecov/c/github/ocelhay/comoOdeCpp)](https://codecov.io/gh/ocelhay/comoOdeCpp)
+[![Codecov](https://img.shields.io/codecov/c/github/bogaotory/comoOdeCpp)](https://codecov.io/gh/bogaotory/comoOdeCpp)
 
 
 
