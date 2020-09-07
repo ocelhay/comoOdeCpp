@@ -9,5 +9,12 @@ r_packages:
 before_install:
   - cd comoOdeCpp
 
+global:
+  - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+  - R_CHECK_ARGS="--no-build-vignettes --no-manual"
+  
+r_build_args: --no-build-vignettes --no-manual
+r_check_args: --no-build-vignettes --no-manual
+
 after_success:
   - Rscript -e 'library(covr);codecov()'
