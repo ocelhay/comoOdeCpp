@@ -76,14 +76,6 @@ check_mortality_count <- function(out_mat) {
                   cinc_mort_10 +
                   cinc_mort_11
 
-  # cinc_mort_H1 <- cumsum(rowSums(parameters["nus"]*parameters["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
-  # cinc_mort_HC1 <- cumsum(rowSums(parameters["nusc"]*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
-  # cinc_mort_ICU1 <- cumsum(rowSums(parameters["nu_icu"]*parameters["pdeath_icu"]*out_mat[,(ICUindex+1)]%*%ifr[,2]))
-  # cinc_mort_ICUC1 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["pdeath_icuc"]*out_mat[,(ICUCindex+1)]%*%ifr[,2]))
-  # cinc_mort_ICUCV1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(ICUCVindex+1)]%*%ifr[,2]))
-  # cinc_mort_Vent1 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*out_mat[,(Ventindex+1)]%*%ifr[,2]))
-  # cinc_mort_VentC1 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*out_mat[,(VentCindex+1)]%*%ifr[,2]))
-
   # Section B
 
   base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
@@ -106,16 +98,42 @@ check_mortality_count <- function(out_mat) {
                   base_mort_Z1 +
                   base_mort_V1  
 
+  # Section C
+
+  base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort)) # not reportable
+  base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort)) # not reportable # reportable
+  base_mort_I1 <- cumsum(rowSums(out_mat[,(Iindex+1)]%*%mort))
+  base_mort_CL1 <- cumsum(rowSums(out_mat[,(CLindex+1)]%*%mort))
+  base_mort_X1 <- cumsum(rowSums(out_mat[,(Xindex+1)]%*%mort))
+  base_mort_QS1 <- cumsum(rowSums(out_mat[,(QSindex+1)]%*%mort)) # not reportable
+  base_mort_QE1 <- cumsum(rowSums(out_mat[,(QEindex+1)]%*%mort)) # not reportable # reportable
+  base_mort_QI1 <- cumsum(rowSums(out_mat[,(QIindex+1)]%*%mort))
+  base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
+  base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort)) # not reportable # reportable
+  base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort)) # not reportable  # reportable
+  # base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort)) # not reportable
+
+  base_mort_sum <- base_mort_sum +
+                    base_mort_S1 +  #*
+                    base_mort_E1 +
+                    base_mort_I1 +
+                    base_mort_CL1 +
+                    base_mort_X1 +
+                    base_mort_QS1 +
+                    base_mort_QE1 +
+                    base_mort_QI1 +
+                    base_mort_QC1 +
+                    base_mort_QR1 +
+                    base_mort_R1    #*
+
   ## total_deaths
   sum_deaths_1 <- last(cinc_mort_sum+base_mort_sum)
-
-  # print(paste("total_deaths:",sum_deaths_1))
+  # print(paste("sum_deaths_1:",sum_deaths_1))
 
 
   ## cum_mortality (total_reported_deaths_end)
   sum_deaths_2 <- last(rowSums(out_mat[,(CMindex+1)]))   
-
-  # print(paste("cum_mortality:",sum_deaths_2))
+  # print(paste("sum_deaths_2:",sum_deaths_2))
 
   # expect_lt(
   #   abs(sum_deaths_2-sum_deaths_1),
@@ -127,29 +145,6 @@ check_mortality_count <- function(out_mat) {
     tolerance = 0.01,
     scale = sum_deaths_2
   )
-
-  # base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
-  # base_mort_HC1 <- cumsum(rowSums(out_mat[,(HCindex+1)]%*%mort))
-  # base_mort_ICU1 <- cumsum(rowSums(out_mat[,(ICUindex+1)]%*%mort))
-  # base_mort_ICUC1 <- cumsum(rowSums(out_mat[,(ICUCindex+1)]%*%mort))
-  # base_mort_ICUCV1 <- cumsum(rowSums(out_mat[,(ICUCVindex+1)]%*%mort)) // was missing
-  # base_mort_Vent1 <- cumsum(rowSums(out_mat[,(Ventindex+1)]%*%mort))
-  # base_mort_VentC1 <- cumsum(rowSums(out_mat[,(VentCindex+1)]%*%mort))
-
-  # Section C
-
-  # base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort)) // not reportable
-  # base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort)) // not reportable
-  # base_mort_I1 <- cumsum(rowSums(out_mat[,(Iindex+1)]%*%mort))
-  # base_mort_CL1 <- cumsum(rowSums(out_mat[,(CLindex+1)]%*%mort))
-  # base_mort_X1 <- cumsum(rowSums(out_mat[,(Xindex+1)]%*%mort))
-  # base_mort_QS1 <- cumsum(rowSums(out_mat[,(QSindex+1)]%*%mort)) // not reportable
-  # base_mort_QE1 <- cumsum(rowSums(out_mat[,(QEindex+1)]%*%mort)) // not reportable
-  # base_mort_QI1 <- cumsum(rowSums(out_mat[,(QIindex+1)]%*%mort))
-  # base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
-  # base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort)) // not reportable
-  # base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort)) // not reportable
-  # base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort)) // not reportable
 
 }
 
