@@ -657,9 +657,21 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%VentC
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV // all above are attributable deaths
                         + mort_col%H + mort_col%HC + mort_col%ICU + mort_col%ICUC + mort_col%Vent + mort_col%VentC
-                        + mort_col%ICUCV //!to add
+                        + mort_col%ICUCV
                         + mort_col%Z // ?to remove, mass tested infected
-                        + mort_col%V ; // ?to remove
+                        + mort_col%V // ?to remove
+                        + mort_col%S
+                        + mort_col%E
+                        + mort_col%I
+                        + mort_col%CL
+                        + mort_col%X
+                        + mort_col%QS
+                        + mort_col%QE
+                        + mort_col%QI
+                        + mort_col%QC
+                        + mort_col%QR
+                        + mort_col%R
+                        ;
 
 // reportable = attributable + mort_col%(!not reportable)
 
