@@ -158,16 +158,25 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   library("comoOdeCpp")
 
   load("data/data_CoMo.RData")
-  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_v15_dex.xlsx")
+  
+  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v15.3.core.R"), local = environment())
+    source(paste0(getwd(), "/v16.1.core.R"), local = environment())
   }
 
-  environment(check_mortality_count) <- environment()
+  for (pp_name in names(parameters)) {
+    if (is.na(parameters[[pp_name]])) {
+      print(paste0("parameters[\"",pp_name, "\"] = ", parameters[[pp_name]]), quote = FALSE)
+      expect_equal(is.na(parameters[[pp_name]]), FALSE)
+      stop()
+    }
+  }
 
-  p_value_list = seq(0.0, 0.1, by = 0.01)
-  # p_value_list = seq(0.03, 0.03)
+  # environment(check_mortality_count) <- environment()
+
+  p_value_list = seq(0.0, 0.1, by = 0.02)
+  # p_value_list = seq(0.1, 0.1)
 
   scenario_list <- list(
     vectors0, # Baseline
@@ -205,32 +214,70 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
                     ihr_col2 = ihr[, 2],
                     mort_col = mort
                     )
-        )
+      )
       expect_equal(output_message, "covidOdeCpp: splinefuns updated")
-      check_mortality_count(out_cpp)
 
-      out_r <- ode(
-                y = Y, times = times, method = "euler", hini = 0.05,
-                func = covid, parms = param_vector, input = ss
-                )
-      check_mortality_count(out_r)
+      processed_cpp <- process_ode_outcome_mortality(out_cpp)
 
-      # sss = sss + 1
+      # stop()
+
+      expect_silent(
+        out_r <- ode(
+                  y = Y, times = times, method = "euler", hini = 0.05,
+                  func = covid, parms = param_vector, input = ss
+                  )
+      )
+
+      processed_r <- process_ode_outcome_mortality(out_r)
+
+      # print(paste("processed_r$total_reported_deaths_end=", processed_r$total_reported_deaths_end))      
+      # print(paste("processed_r$total_deaths_end=", processed_r$total_deaths_end))      
+
+      # print(paste(
+      #     "results$attributable_deaths_end:", processed_cpp$attributable_deaths_end, ",", processed_r$attributable_deaths_end,
+      #     "results$reportable_death:", processed_cpp$reportable_death, ",", processed_r$reportable_death,
+      #     "results$total_deaths_end:", processed_cpp$total_deaths_end, ",", processed_r$total_deaths_end
+      #   ))
+
+      # expect_equal(processed_cpp$attributable_deaths_end, processed_r$attributable_deaths_end)
+      # expect_equal(processed_cpp$reportable_death, processed_r$reportable_death)
+      # expect_equal(processed_cpp$total_deaths_end, processed_r$total_deaths_end)
+
+      # sss = 1
       # write.csv(out_cpp, paste0("out_cpp_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
       # write.csv(out_r, paste0("out_r_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
 
       for (ii in 1:1000) {
         rr = sample(1:nrow(out_r),1)
         cc = sample(1:ncol(out_r),1)
-        expect_equal(
-          out_cpp[rr,cc],
-          out_r[rr,cc],
-          tolerance = 0.0001,
-          scale = out_r[rr,cc]
-        )
+        # print(paste("out_r[rr,cc] =", out_r[rr,cc]))
+        # print(paste("out_cpp[rr,cc] =", out_cpp[rr,cc]))
+
+        expect_gte(out_r[rr,cc], 0) # >=0
+        expect_gte(out_cpp[rr,cc], 0) # >=0
+
+        if (out_r[rr,cc] > 0) {
+
+          res = expect_equal(
+            out_cpp[rr,cc],
+            out_r[rr,cc],
+            tolerance = 0.0001,
+            scale = out_r[rr,cc]
+          )
+
+          if(abs(out_cpp[rr,cc]-out_r[rr,cc])>out_r[rr,cc]*0.0001){
+            print(paste(
+              "not equal: rr=", rr,
+              ", cc=", cc,
+              ", pp=", pp,
+              ", out_r[rr,cc]", out_r[rr,cc],
+              ", out_cpp[rr,cc]", out_cpp[rr,cc]
+            ))
+          }
+
+        }
       }
 
-      # expect_equal(out_cpp, out_r)
     }
   }
 
