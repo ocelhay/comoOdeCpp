@@ -176,7 +176,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   # environment(check_mortality_count) <- environment()
 
   p_value_list = seq(0.0, 0.1, by = 0.01)
-  # p_value_list = seq(0.1, 0.1)
+  p_value_list = seq(0.1, 0.1)
 
   scenario_list <- list(
     vectors0, # Baseline
