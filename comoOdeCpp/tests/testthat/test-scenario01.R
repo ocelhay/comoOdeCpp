@@ -12,142 +12,6 @@ check_libraries <- function() {
   }
 }
 
-check_mortality_count <- function(out_mat) {
-
-  dexo2_hist <- rep(0,length(times))
-  dexo2c_hist <- rep(0,length(times))
-  dexv_hist <- rep(0,length(times))
-  dexvc_hist <- rep(0,length(times))
-
-  for (tt in times) {
-    if((tt)<max(times)){
-      if(ss$dex[tt*20+1]) {
-        dexo2_hist[tt+1] <- parameters["dexo2"]
-        dexo2c_hist[tt+1] <- parameters["dexo2c"]
-        dexv_hist[tt+1] <- parameters["dexv"]
-        dexvc_hist[tt+1] <- parameters["dexvc"]
-      } else {
-        dexo2_hist[tt+1] <- 1
-        dexo2c_hist[tt+1] <- 1
-        dexv_hist[tt+1] <- 1
-        dexvc_hist[tt+1] <- 1
-      }
-    } else {
-      dexo2_hist[tt+1] <- dexo2_hist[tt]
-      dexo2c_hist[tt+1] <- dexo2c_hist[tt]
-      dexv_hist[tt+1] <- dexv_hist[tt]
-      dexvc_hist[tt+1] <- dexvc_hist[tt]
-    }
-  }
-
-  # dexo2_hist_mat = matrix(dexo2_hist, nrow=length(dexo2_hist), ncol = A, byrow=FALSE)
-
-  # Secion A (Attributable)
-
-  cinc_mort_1 <- cumsum(rowSums(parameters["nus"]*parameters["propo2"]*parameters["pdeath_ho"]*dexo2_hist*(out_mat[,(Hindex+1)]%*%ifr[,2])))
-  cinc_mort_2 <- cumsum(rowSums(parameters["nus"]*(1-parameters["propo2"])*parameters["pdeath_h"]*(out_mat[,(Hindex+1)]%*%ifr[,2])))
-  cinc_mort_3 <- cumsum(rowSums(parameters["nusc"]*parameters["propo2"]*parameters["pdeath_hco"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
-  cinc_mort_4 <- cumsum(rowSums(parameters["nusc"]*(1-parameters["propo2"])*parameters["pdeath_hc"]*(out_mat[,(HCindex+1)]%*%ifr[,2])))
-  cinc_mort_5 <- cumsum(rowSums(parameters["nu_icu"]*parameters["propo2"]*parameters["pdeath_icuo"]*dexo2_hist*(out_mat[,(ICUindex+1)]%*%ifr[,2])))
-  cinc_mort_6 <- cumsum(rowSums(parameters["nu_icu"]*(1-parameters["propo2"])*parameters["pdeath_icu"]*(out_mat[,(ICUindex+1)]%*%ifr[,2])))
-  cinc_mort_7 <- cumsum(rowSums(parameters["nu_icuc"]*parameters["propo2"]*parameters["pdeath_icuco"]*dexo2c_hist*(out_mat[,(ICUCindex+1)]%*%ifr[,2])))
-  cinc_mort_8 <- cumsum(rowSums(parameters["nu_icuc"]*(1-parameters["propo2"])*parameters["pdeath_icuc"]*(out_mat[,(ICUCindex+1)]%*%ifr[,2])))
-  cinc_mort_9 <- cumsum(rowSums(parameters["nu_vent"]*parameters["pdeath_vent"]*dexv_hist*(out_mat[,(Ventindex+1)]%*%ifr[,2])))
-  cinc_mort_10 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_mat[,(VentCindex+1)]%*%ifr[,2])))
-  cinc_mort_11 <- cumsum(rowSums(parameters["nu_ventc"]*parameters["pdeath_ventc"]*dexvc_hist*(out_mat[,(ICUCVindex+1)]%*%ifr[,2])))
-
-  cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
-  cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4
-  cinc_mort_ICU1 <- cinc_mort_5 + cinc_mort_6
-  cinc_mort_ICUC1 <- cinc_mort_7 + cinc_mort_8
-  cinc_mort_Vent1 <- cinc_mort_9
-  cinc_mort_VentC1 <- cinc_mort_10
-  cinc_mort_ICUCV1 <- cinc_mort_11
-
-  cinc_mort_sum <- cinc_mort_1 + 
-                  cinc_mort_2 +
-                  cinc_mort_3 +
-                  cinc_mort_4 +
-                  cinc_mort_5 +
-                  cinc_mort_6 +
-                  cinc_mort_7 +
-                  cinc_mort_8 +
-                  cinc_mort_9 +
-                  cinc_mort_10 +
-                  cinc_mort_11
-
-  # Section B
-
-  base_mort_H1 <- cumsum(rowSums(out_mat[,(Hindex+1)]%*%mort))
-  base_mort_HC1 <- cumsum(rowSums(out_mat[,(HCindex+1)]%*%mort))
-  base_mort_ICU1 <- cumsum(rowSums(out_mat[,(ICUindex+1)]%*%mort))
-  base_mort_ICUC1 <- cumsum(rowSums(out_mat[,(ICUCindex+1)]%*%mort))
-  base_mort_ICUCV1 <- cumsum(rowSums(out_mat[,(ICUCVindex+1)]%*%mort))
-  base_mort_Vent1 <- cumsum(rowSums(out_mat[,(Ventindex+1)]%*%mort))
-  base_mort_VentC1 <- cumsum(rowSums(out_mat[,(VentCindex+1)]%*%mort))
-  base_mort_Z1 <- cumsum(rowSums(out_mat[,(Zindex+1)]%*%mort))
-  base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort))
-
-  base_mort_sum <- base_mort_H1 +
-                  base_mort_HC1 +
-                  base_mort_ICU1 +
-                  base_mort_ICUC1 +
-                  base_mort_ICUCV1 +
-                  base_mort_Vent1 +
-                  base_mort_VentC1 +
-                  base_mort_Z1 +
-                  base_mort_V1  
-
-  # Section C
-
-  base_mort_S1 <- cumsum(rowSums(out_mat[,(Sindex+1)]%*%mort)) # not reportable
-  base_mort_E1 <- cumsum(rowSums(out_mat[,(Eindex+1)]%*%mort)) # not reportable # reportable
-  base_mort_I1 <- cumsum(rowSums(out_mat[,(Iindex+1)]%*%mort))
-  base_mort_CL1 <- cumsum(rowSums(out_mat[,(CLindex+1)]%*%mort))
-  base_mort_X1 <- cumsum(rowSums(out_mat[,(Xindex+1)]%*%mort))
-  base_mort_QS1 <- cumsum(rowSums(out_mat[,(QSindex+1)]%*%mort)) # not reportable
-  base_mort_QE1 <- cumsum(rowSums(out_mat[,(QEindex+1)]%*%mort)) # not reportable # reportable
-  base_mort_QI1 <- cumsum(rowSums(out_mat[,(QIindex+1)]%*%mort))
-  base_mort_QC1 <- cumsum(rowSums(out_mat[,(QCindex+1)]%*%mort))
-  base_mort_QR1 <- cumsum(rowSums(out_mat[,(QRindex+1)]%*%mort)) # not reportable # reportable
-  base_mort_R1 <- cumsum(rowSums(out_mat[,(Rindex+1)]%*%mort)) # not reportable  # reportable
-  # base_mort_V1 <- cumsum(rowSums(out_mat[,(Vindex+1)]%*%mort)) # not reportable
-
-  base_mort_sum <- base_mort_sum +
-                    base_mort_S1 +  #*
-                    base_mort_E1 +
-                    base_mort_I1 +
-                    base_mort_CL1 +
-                    base_mort_X1 +
-                    base_mort_QS1 +
-                    base_mort_QE1 +
-                    base_mort_QI1 +
-                    base_mort_QC1 +
-                    base_mort_QR1 +
-                    base_mort_R1    #*
-
-  ## total_deaths
-  sum_deaths_1 <- last(cinc_mort_sum+base_mort_sum)
-  # print(paste("sum_deaths_1:",sum_deaths_1))
-
-
-  ## cum_mortality (total_reported_deaths_end)
-  sum_deaths_2 <- last(rowSums(out_mat[,(CMindex+1)]))   
-  # print(paste("sum_deaths_2:",sum_deaths_2))
-
-  # expect_lt(
-  #   abs(sum_deaths_2-sum_deaths_1),
-  #   1
-  # )
-  expect_equal(
-    sum_deaths_1,
-    sum_deaths_2,
-    tolerance = 0.01,
-    scale = sum_deaths_2
-  )
-
-}
-
 test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   check_libraries()
   rm(list = ls())
@@ -217,7 +81,14 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
       )
       expect_equal(output_message, "covidOdeCpp: splinefuns updated")
 
-      processed_cpp <- process_ode_outcome_mortality(out_cpp)
+      processed_cpp_results <- process_ode_outcome_mortality(out_cpp, ss, param_vector)
+
+      expect_equal(
+        processed_cpp_results$total_reportable_deaths_end,
+        processed_cpp_results$total_cm_deaths_end,
+        tolerance = 0.01,
+        scale = processed_cpp_results$total_cm_deaths_end
+      )
 
       # stop()
 
@@ -228,7 +99,27 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
                   )
       )
 
-      processed_r <- process_ode_outcome_mortality(out_r)
+      processed_r_results <- process_ode_outcome_mortality(out_r, ss, param_vector)
+
+      expect_equal(
+        processed_r_results$total_reportable_deaths_end,
+        processed_r_results$total_cm_deaths_end,
+        tolerance = 0.01,
+        scale = processed_r_results$total_cm_deaths_end
+      )
+
+      expect_equal(
+        processed_cpp_results$total_cm_deaths_end,
+        processed_r_results$total_cm_deaths_end,
+        tolerance = 0.0001,
+        scale = processed_r_results$total_cm_deaths_end
+      )
+      expect_equal(
+        processed_cpp_results$total_reportable_deaths_end,
+        processed_r_results$total_reportable_deaths_end,
+        tolerance = 0.0001,
+        scale = processed_r_results$total_reportable_deaths_end
+      )
 
       # print(paste("processed_r$total_reported_deaths_end=", processed_r$total_reported_deaths_end))      
       # print(paste("processed_r$total_deaths_end=", processed_r$total_deaths_end))      
