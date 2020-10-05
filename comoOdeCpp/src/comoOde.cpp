@@ -590,7 +590,7 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
              trvban_eff = travelban_eff;
            }
            if(quarantine){
-             rate_q = std::min(std::min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC+HCV+HCICU))*(household_size-1.0)/sum(P),1.0) * quarantine_effort, quarantine_cov/2.0);
+             rate_q = std::min(std::min(sum((CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC+HCV+HCICU))*(household_size-1.0)/sum(P),1.0) * quarantine_effort, quarantine_cov/2.0);
              quarantine_rate = rate_q/(1.0+exp(-10.0*(quarantine_cov/2.0-Q)));
            }
 
@@ -1109,9 +1109,9 @@ List covidOdeCpp(double t, const arma::vec& y, const List& parameters,
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%VentC
                         + nu_ventc*dexvc*pdeath_ventc*ifr_col2%ICUCV
                         
-                        + nu_ventc           *pdeath_vent_hc*ifr_col2%HCV
-                        + nu_icuc *propo2    *pdeath_icu_hco*ifr_col2%HCICU
-                        + nu_icuc *(1.0-propo2)*pdeath_icu_hc *ifr_col2%HCICU // all above are attributable deaths
+                        + nu_ventc*report_death_HC*pdeath_vent_hc*ifr_col2%HCV
+                        + nu_icuc *report_death_HC*propo2      *pdeath_icu_hco*ifr_col2%HCICU
+                        + nu_icuc *report_death_HC*(1.0-propo2)*pdeath_icu_hc *ifr_col2%HCICU // all above are attributable deaths
 
                         + mort_col%H
                         + mort_col%ICU

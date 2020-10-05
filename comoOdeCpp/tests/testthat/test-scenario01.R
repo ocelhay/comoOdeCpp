@@ -26,7 +26,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v16.1.core.R"), local = environment())
+    source(paste0(getwd(), "/v16.2.core.R"), local = environment())
   }
 
   for (pp_name in names(parameters)) {
