@@ -487,6 +487,7 @@ initS<-popstruc[,2]-initE-initI-initCL-initR-initX-initZ-initV-initH-initHC-init
 inp <- read_excel(file_path, sheet = "Interventions")
 inputs<-function(inp, run){
   # cap intervention end dates with simulation end date
+  inp$`Date Start` = pmin(stopdate, as.Date(inp$`Date Start`))
   inp$`Date End` = pmin(stopdate, as.Date(inp$`Date End`))
   
   tv<-which(inp$`Apply to`==run)
