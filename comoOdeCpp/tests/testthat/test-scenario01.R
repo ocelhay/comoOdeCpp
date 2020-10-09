@@ -1,4 +1,6 @@
 
+CORE_FILE <- "/v16.2.core.R"
+
 check_libraries <- function() {
   library_list <- list(
     "deSolve",
@@ -12,7 +14,86 @@ check_libraries <- function() {
   }
 }
 
+check_parameters_list_for_na <- function(parameters_list) {
+  for (pp_name in names(parameters_list)) {
+    if (is.na(parameters_list[[pp_name]])) {
+      print(paste0("parameters_list[\"",pp_name, "\"] = ", parameters_list[[pp_name]]), quote = FALSE)
+      expect_equal(is.na(parameters_list[[pp_name]]), FALSE)
+      stop()
+    }
+  }
+}
+
+test_that("Splitting intervention", {
+  check_libraries()
+  rm(list = ls())
+
+  library("deSolve")
+  library("dplyr")
+  library("readxl")
+  library("comoOdeCpp")
+
+  load("data/data_CoMo.RData")
+  
+  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_intv_split.xlsx")
+
+  # if (!exists("inputs", mode = "function")) {
+    source(paste0(getwd(), CORE_FILE), local = environment())
+  # }
+
+  check_parameters_list_for_na(parameters)
+  covidOdeCpp_reset()
+  output_message <- capture_output(
+    out_base <- ode(
+                y = Y, times = times, method = "euler", hini = 0.05,
+                func = covidOdeCpp, parms = parameters,
+                input = vectors, A = A,
+                contact_home = contact_home,
+                contact_school = contact_school,
+                contact_work = contact_work,
+                contact_other = contact_other,
+                popbirth_col2 = popbirth[, 2],
+                popstruc_col2 = popstruc[, 2],
+                ageing = ageing,
+                ifr_col2 = ifr[, 2],
+                ihr_col2 = ihr[, 2],
+                mort_col = mort
+                )
+  )
+  processed_base_results <- process_ode_outcome_mortality(out_base, vectors, parameters)
+
+
+  covidOdeCpp_reset()
+  output_message <- capture_output(
+    out_hype <- ode(
+                y = Y, times = times, method = "euler", hini = 0.05,
+                func = covidOdeCpp, parms = parameters,
+                input = vectors0 , A = A,
+                contact_home = contact_home,
+                contact_school = contact_school,
+                contact_work = contact_work,
+                contact_other = contact_other,
+                popbirth_col2 = popbirth[, 2],
+                popstruc_col2 = popstruc[, 2],
+                ageing = ageing,
+                ifr_col2 = ifr[, 2],
+                ihr_col2 = ihr[, 2],
+                mort_col = mort
+                )
+  )
+  processed_hype_results <- process_ode_outcome_mortality(out_hype, vectors0, parameters)
+
+  expect_equal(
+    processed_base_results$total_cm_deaths_end,
+    processed_hype_results$total_cm_deaths_end
+  )
+
+
+})
+
 test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
+  # skip()
+
   check_libraries()
   rm(list = ls())
 
@@ -26,7 +107,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
 
   if (!exists("inputs", mode = "function")) {
-    source(paste0(getwd(), "/v16.2.core.R"), local = environment())
+    source(paste0(getwd(), CORE_FILE), local = environment())
   }
 
   for (pp_name in names(parameters)) {
