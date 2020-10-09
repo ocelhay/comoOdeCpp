@@ -1659,9 +1659,9 @@ process_ode_outcome_mortality <- function(out_mean, intv_vector, param_used, pri
   cinc_mort_10 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mean[,(VentCindex+1)]%*%ifr[,2])))
   cinc_mort_11 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mean[,(ICUCVindex+1)]%*%ifr[,2])))
   
-  cinc_mort_14 <- cumsum(rowSums(param_used["nu_ventc"]*parameters["report_death_HC"]*param_used["pdeath_vent_hc"]*(out_mean[,(HCVindex+1)]%*%ifr[,2])))
-  cinc_mort_12 <- cumsum(rowSums(param_used["nu_icuc"] *parameters["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
-  cinc_mort_13 <- cumsum(rowSums(param_used["nu_icuc"] *parameters["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
+  cinc_mort_14 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["report_death_HC"]*param_used["pdeath_vent_hc"]*(out_mean[,(HCVindex+1)]%*%ifr[,2])))
+  cinc_mort_12 <- cumsum(rowSums(param_used["nu_icuc"] *param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
+  cinc_mort_13 <- cumsum(rowSums(param_used["nu_icuc"] *param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
   
   cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
   cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4 + cinc_mort_12 + cinc_mort_13 + cinc_mort_14
