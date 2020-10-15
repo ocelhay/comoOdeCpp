@@ -54,7 +54,7 @@ test_that("Splitting intervention", {
     out_base <- ode(
                 y = Y, times = times, method = "euler", hini = 0.05,
                 func = covidOdeCpp, parms = parameters,
-                input = vectors, A = A,
+                input = vectors0, A = A,
                 contact_home = contact_home,
                 contact_school = contact_school,
                 contact_work = contact_work,
@@ -75,7 +75,7 @@ test_that("Splitting intervention", {
     out_hype <- ode(
                 y = Y, times = times, method = "euler", hini = 0.05,
                 func = covidOdeCpp, parms = parameters,
-                input = vectors0 , A = A,
+                input = vectors , A = A,
                 contact_home = contact_home,
                 contact_school = contact_school,
                 contact_work = contact_work,
