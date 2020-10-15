@@ -1,45 +1,8 @@
 
-CORE_FILE <- "/v16.2.core.R"
-
-check_libraries <- function() {
-  library_list <- list(
-    "deSolve",
-    "dplyr",
-    "readxl"
-  )
-  for (ll in library_list) {
-    if (!requireNamespace(ll, quietly = TRUE)) {
-      testthat::skip(paste(ll, "needed but not available"))
-    }
-  }
-}
-
-load_libraries <- function() {
-  check_libraries()
-  library("deSolve")
-  library("dplyr")
-  library("readxl")
-  library("comoOdeCpp")
-}
-
-init <- function(e) {
-  load_libraries()
-  load("data/data_CoMo.RData", envir = e)
-}
-
-check_parameters_list_for_na <- function(parameters_list) {
-  for (pp_name in names(parameters_list)) {
-    if (is.na(parameters_list[[pp_name]])) {
-      print(paste0("parameters_list[\"",pp_name, "\"] = ", parameters_list[[pp_name]]), quote = FALSE)
-      expect_equal(is.na(parameters_list[[pp_name]]), FALSE)
-      stop()
-    }
-  }
-}
-
 test_that("Splitting intervention", {
   # skip("temp skip")
   rm(list = ls())
+  source(paste0(getwd(), "/common.R"), local = environment())
   init(e=environment())
 
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_intv_split.xlsx")
@@ -67,7 +30,7 @@ test_that("Splitting intervention", {
                 mort_col = mort
                 )
   )
-  processed_base_results <- process_ode_outcome_mortality(out_base, vectors, parameters)
+  processed_base_results <- process_ode_outcome_mortality(out_base, vectors0, parameters)
 
 
   covidOdeCpp_reset()
@@ -88,7 +51,7 @@ test_that("Splitting intervention", {
                 mort_col = mort
                 )
   )
-  processed_hype_results <- process_ode_outcome_mortality(out_hype, vectors0, parameters)
+  processed_hype_results <- process_ode_outcome_mortality(out_hype, vectors, parameters)
 
   expect_equal(
     processed_base_results$total_cm_deaths_end,
@@ -99,9 +62,10 @@ test_that("Splitting intervention", {
 })
 
 test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
-  # skip("temp skip")
+  skip("temp skip")
 
   rm(list = ls())
+  source(paste0(getwd(), "/common.R"), local = environment())
   init(e=environment())
   
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
@@ -110,13 +74,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
     source(paste0(getwd(), CORE_FILE), local = environment())
   }
 
-  for (pp_name in names(parameters)) {
-    if (is.na(parameters[[pp_name]])) {
-      print(paste0("parameters[\"",pp_name, "\"] = ", parameters[[pp_name]]), quote = FALSE)
-      expect_equal(is.na(parameters[[pp_name]]), FALSE)
-      stop()
-    }
-  }
+  check_parameters_list_for_na(parameters)
 
   # environment(check_mortality_count) <- environment()
 
