@@ -14,6 +14,19 @@ check_libraries <- function() {
   }
 }
 
+load_libraries <- function() {
+  check_libraries()
+  library("deSolve")
+  library("dplyr")
+  library("readxl")
+  library("comoOdeCpp")
+}
+
+init <- function(e) {
+  load_libraries()
+  load("data/data_CoMo.RData", envir = e)
+}
+
 check_parameters_list_for_na <- function(parameters_list) {
   for (pp_name in names(parameters_list)) {
     if (is.na(parameters_list[[pp_name]])) {
@@ -25,16 +38,10 @@ check_parameters_list_for_na <- function(parameters_list) {
 }
 
 test_that("Splitting intervention", {
-  check_libraries()
+  # skip("temp skip")
   rm(list = ls())
+  init(e=environment())
 
-  library("deSolve")
-  library("dplyr")
-  library("readxl")
-  library("comoOdeCpp")
-
-  load("data/data_CoMo.RData")
-  
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_intv_split.xlsx")
 
   # if (!exists("inputs", mode = "function")) {
@@ -92,17 +99,10 @@ test_that("Splitting intervention", {
 })
 
 test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
-  # skip()
+  # skip("temp skip")
 
-  check_libraries()
   rm(list = ls())
-
-  library("deSolve")
-  library("dplyr")
-  library("readxl")
-  library("comoOdeCpp")
-
-  load("data/data_CoMo.RData")
+  init(e=environment())
   
   file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
 
