@@ -4,8 +4,9 @@ test_that("Sensitivity", {
     source(paste0(getwd(), "/common.R"), local = environment())
     init(e=environment())
 
+    VERBOSE = FALSE
 
-    file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_sa.xlsx")
+    file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_sa.xlsx")
 
     if (!exists("inputs", mode = "function")) {
         source(paste0(getwd(), CORE_FILE), local = environment())
@@ -77,6 +78,12 @@ test_that("Sensitivity", {
         parameters_mod <- parameters
         parameters_mod[pp_name] = parameters_mod[pp_name] * sa_multipliers[match(pp_name, sa_parameters)]
 
+        if (VERBOSE) {
+            print(pp_name)
+            print(parameters[pp_name])
+            print(parameters_mod[pp_name])
+        }
+
         covidOdeCpp_reset()
         output_message <- capture_output(
             out_hype_mod <- ode(
@@ -97,6 +104,13 @@ test_that("Sensitivity", {
         )
 
         processed_hype_mod_results <- process_ode_outcome_mortality(out_hype_mod, vectors, parameters_mod)
+
+        if (VERBOSE) {
+            print("processed_hype_results$total_cm_deaths_end:")
+            print(processed_hype_results$total_cm_deaths_end)
+            print("processed_hype_mod_results$total_cm_deaths_end:")
+            print(processed_hype_mod_results$total_cm_deaths_end)
+        }
 
         if (sa_expect_mort_inc[match(pp_name, sa_parameters)]) {
             expect_gt(
