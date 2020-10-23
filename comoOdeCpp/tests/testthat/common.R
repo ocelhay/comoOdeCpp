@@ -64,11 +64,11 @@ match_outputs <-function(
       res = expect_equal(
         outB,
         outA,
-        tolerance = 0.0001,
+        tolerance = tlr,
         scale = outA
       )
 
-      if(abs(outB-outA)>outA*0.0001){
+      if(abs(outB-outA)>outA*tlr){
         print(paste(
           "not equal: rr=", rr,
           ", cc=", cc,
@@ -81,4 +81,28 @@ match_outputs <-function(
     }
   }
 
+}
+
+match_processed_outputs <- function(
+    outputA,    # processed output matrix
+    outputB,    # processed output matrix
+    tlr = 0.0001 # tolerance
+  ) {
+
+  expect_true(is.numeric(outputA$total_cm_deaths_end))
+  expect_true(is.numeric(outputA$total_reportable_deaths_end))
+
+  expect_equal(
+      outputA$total_cm_deaths_end,
+      outputB$total_cm_deaths_end,
+      tolerance = tlr,
+      scale = outputB$total_cm_deaths_end
+  )
+
+  expect_equal(
+      outputA$total_reportable_deaths_end,
+      outputB$total_reportable_deaths_end,
+      tolerance = tlr,
+      scale = outputB$total_reportable_deaths_end
+  )
 }

@@ -153,18 +153,24 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
         scale = processed_r_results$total_cm_deaths_end
       )
 
-      expect_equal(
-        processed_cpp_results$total_cm_deaths_end,
-        processed_r_results$total_cm_deaths_end,
-        tolerance = 0.0001,
-        scale = processed_r_results$total_cm_deaths_end
+      match_processed_outputs(
+          outputA = processed_cpp_results,
+          outputB = processed_r_results,
+          tlr = 0.0001
       )
-      expect_equal(
-        processed_cpp_results$total_reportable_deaths_end,
-        processed_r_results$total_reportable_deaths_end,
-        tolerance = 0.0001,
-        scale = processed_r_results$total_reportable_deaths_end
-      )
+
+      # expect_equal(
+      #   processed_cpp_results$total_cm_deaths_end,
+      #   processed_r_results$total_cm_deaths_end,
+      #   tolerance = 0.0001,
+      #   scale = processed_r_results$total_cm_deaths_end
+      # )
+      # expect_equal(
+      #   processed_cpp_results$total_reportable_deaths_end,
+      #   processed_r_results$total_reportable_deaths_end,
+      #   tolerance = 0.0001,
+      #   scale = processed_r_results$total_reportable_deaths_end
+      # )
 
       # print(paste("processed_r$total_reported_deaths_end=", processed_r$total_reported_deaths_end))      
       # print(paste("processed_r$total_deaths_end=", processed_r$total_deaths_end))      
