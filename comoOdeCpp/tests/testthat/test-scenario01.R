@@ -3,7 +3,7 @@ test_that("Splitting intervention", {
   # skip("temp skip")
   rm(list = ls())
   source(paste0(getwd(), "/common.R"), local = environment())
-  init(e=environment())
+  init(e = environment())
 
   file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_intv_split.xlsx")
 
@@ -38,7 +38,7 @@ test_that("Splitting intervention", {
     out_hype <- ode(
                 y = Y, times = times, method = "euler", hini = 0.05,
                 func = covidOdeCpp, parms = parameters,
-                input = vectors , A = A,
+                input = vectors, A = A,
                 contact_home = contact_home,
                 contact_school = contact_school,
                 contact_work = contact_work,
@@ -59,8 +59,8 @@ test_that("Splitting intervention", {
   )
 
   match_outputs(
-    outputA = out_base,
-    outputB = out_hype,
+    output_a = out_base,
+    output_b = out_hype,
     tlr = 0.0001,
     smp = 100
   )
@@ -72,8 +72,8 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
 
   rm(list = ls())
   source(paste0(getwd(), "/common.R"), local = environment())
-  init(e=environment())
-  
+  init(e = environment())
+
   file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_r_v_cpp.xlsx")
 
   if (!exists("inputs", mode = "function")) {
@@ -84,8 +84,8 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
 
   # environment(check_mortality_count) <- environment()
 
-  p_value_list = seq(0.0, 0.1, by = 0.025)
-  # p_value_list = seq(0.1, 0.1)
+  p_value_list <- seq(0.0, 0.1, by = 0.025)
+  # p_value_list <- seq(0.1, 0.1)
 
   scenario_list <- list(
     vectors0, # Baseline
@@ -103,7 +103,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
         + rnorm(
             length(parameters_noise),
             mean = 0,
-            sd = noise*abs(parameters[parameters_noise])
+            sd = noise * abs(parameters[parameters_noise])
           )
 
       covidOdeCpp_reset()
@@ -154,44 +154,18 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
       )
 
       match_processed_outputs(
-          outputA = processed_cpp_results,
-          outputB = processed_r_results,
+          output_a = processed_cpp_results,
+          output_b = processed_r_results,
           tlr = 0.0001
       )
-
-      # expect_equal(
-      #   processed_cpp_results$total_cm_deaths_end,
-      #   processed_r_results$total_cm_deaths_end,
-      #   tolerance = 0.0001,
-      #   scale = processed_r_results$total_cm_deaths_end
-      # )
-      # expect_equal(
-      #   processed_cpp_results$total_reportable_deaths_end,
-      #   processed_r_results$total_reportable_deaths_end,
-      #   tolerance = 0.0001,
-      #   scale = processed_r_results$total_reportable_deaths_end
-      # )
-
-      # print(paste("processed_r$total_reported_deaths_end=", processed_r$total_reported_deaths_end))      
-      # print(paste("processed_r$total_deaths_end=", processed_r$total_deaths_end))      
-
-      # print(paste(
-      #     "results$attributable_deaths_end:", processed_cpp$attributable_deaths_end, ",", processed_r$attributable_deaths_end,
-      #     "results$reportable_death:", processed_cpp$reportable_death, ",", processed_r$reportable_death,
-      #     "results$total_deaths_end:", processed_cpp$total_deaths_end, ",", processed_r$total_deaths_end
-      #   ))
-
-      # expect_equal(processed_cpp$attributable_deaths_end, processed_r$attributable_deaths_end)
-      # expect_equal(processed_cpp$reportable_death, processed_r$reportable_death)
-      # expect_equal(processed_cpp$total_deaths_end, processed_r$total_deaths_end)
 
       # sss = 1
       # write.csv(out_cpp, paste0("out_cpp_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
       # write.csv(out_r, paste0("out_r_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
 
       match_outputs(
-        outputA = out_r,
-        outputB = out_cpp,
+        output_a = out_r,
+        output_b = out_cpp,
         tlr = 0.0001,
         smp = 1000
       )

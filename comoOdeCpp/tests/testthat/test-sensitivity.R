@@ -2,9 +2,9 @@ test_that("Sensitivity", {
     # skip("temp skip")
     rm(list = ls())
     source(paste0(getwd(), "/common.R"), local = environment())
-    init(e=environment())
+    init(e = environment())
 
-    VERBOSE = FALSE
+    VERBOSE <- FALSE
 
     file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_sa.xlsx")
 
@@ -45,7 +45,7 @@ test_that("Sensitivity", {
 
         # "school_eff",
         "cocoon_eff",
-    	# "travelban_eff",
+        # "travelban_eff",
         "vaccine_eff"
     )
     sa_multipliers <- c(
@@ -76,7 +76,7 @@ test_that("Sensitivity", {
     for (pp_name in sa_parameters) {
 
         parameters_mod <- parameters
-        parameters_mod[pp_name] = parameters_mod[pp_name] * sa_multipliers[match(pp_name, sa_parameters)]
+        parameters_mod[pp_name] <- parameters_mod[pp_name] * sa_multipliers[match(pp_name, sa_parameters)]
 
         if (VERBOSE) {
             print(pp_name)
