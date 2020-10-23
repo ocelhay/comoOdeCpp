@@ -15,7 +15,7 @@ global:
   - R_BUILD_ARGS="--no-build-vignettes --no-manual"
   - R_CHECK_ARGS="--no-build-vignettes --no-manual"
   - LINTR_COMMENT_BOT=FALSE
-  
+
 r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual
 
