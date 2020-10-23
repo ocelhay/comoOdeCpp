@@ -9,3 +9,4 @@
 *.so
 *.Rcheck
 temp_out/
+r_versions/
