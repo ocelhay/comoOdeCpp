@@ -1,5 +1,5 @@
 #' Read the "Interventions" tab of the template into a list of time-series vectors
-#' 
+#'
 #' This function is to provide the same functionality of the inputs function that's part of the como App
 #' which is to translate the information from the Excel spreadsheet to a list of time-series vectors controlling
 #' the actions of different interventions during the course of the simulation
@@ -16,48 +16,48 @@ read_intervention_schedule <- function(
         age_testing_max,    # "Interventions Param" tab
         age_vaccine_min,    # "Interventions Param" tab
         age_vaccine_max,     # "Interventions Param" tab
-        FILL_1DAY_GAP = TRUE
+        fill_day_gap = TRUE
     ) {
 
-    v<-(format(as.POSIXct(inp[["Date Start"]],format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
-    v2<-as.Date(v,format="%d/%m/%y")
-    inp[["Date Start"]]<-v2
+    v  <- (format(as.POSIXct(inp[["Date Start"]], format = "%Y/%m/%d %H:%M:%S"), format = "%d/%m/%y"))
+    v2 <- as.Date(v, format = "%d/%m/%y")
+    inp[["Date Start"]] <- v2
 
-    v<-(format(as.POSIXct(inp[["Date End"]],format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
-    v2<-as.Date(v,format="%d/%m/%y")
-    inp[["Date End"]]<-v2
+    v  <- (format(as.POSIXct(inp[["Date End"]], format = "%Y/%m/%d %H:%M:%S"), format = "%d/%m/%y"))
+    v2 <- as.Date(v, format = "%d/%m/%y")
+    inp[["Date End"]] <- v2
 
-    
-    inp[["Date Start"]] = pmax(startdate, as.Date(inp[["Date Start"]]))
-    inp[["Date End"]] = pmax(startdate, as.Date(inp[["Date End"]]))
+
+    inp[["Date Start"]] <- pmax(startdate, as.Date(inp[["Date Start"]]))
+    inp[["Date End"]] <- pmax(startdate, as.Date(inp[["Date End"]]))
 
     # cap intervention end dates with simulation end date
-    inp[["Date Start"]] = pmin(stopdate, as.Date(inp[["Date Start"]]))
-    inp[["Date End"]] = pmin(stopdate, as.Date(inp[["Date End"]]))
+    inp[["Date Start"]] <- pmin(stopdate, as.Date(inp[["Date Start"]]))
+    inp[["Date End"]] <- pmin(stopdate, as.Date(inp[["Date End"]]))
 
 
-    inp <- arrange(inp, `Date Start`)
+    inp <- dplyr::arrange(inp, "Date Start")
 
-    tv<-which(inp[["Apply to"]]==run)
+    tv <- which(inp[["Apply to"]] == run)
 
     intv_profile_list <- list(
-        list(text="Self-isolation if Symptomatic"           , val_vec="si_vector"     , val_default=0,     bol_vec="isolation"   ),
-        list(text="(*Self-isolation) Screening"             , val_vec="scr_vector"    , val_default=0,     bol_vec="screen"      ),
-        list(text="(*Self-isolation) Household Isolation"   , val_vec="q_vector"      , val_default=0,     bol_vec="quarantine"  ),
-        list(text="Social Distancing"                       , val_vec="sd_vector"     , val_default=0,     bol_vec="distancing"  ),
-        list(text="Handwashing"                             , val_vec="hw_vector"     , val_default=0,     bol_vec="handwash"    ),
-        list(text="Mask Wearing"                            , val_vec="msk_vector"    , val_default=0,     bol_vec="masking"     ),
-        list(text="Working at Home"                         , val_vec="wah_vector"    , val_default=0,     bol_vec="workhome"    ),
-        list(text="School Closures"                         , val_vec="sc_vector"     , val_default=0,     bol_vec="schoolclose" ),
-        list(text="Shielding the Elderly"                   , val_vec="cte_vector"    , val_default=0,     bol_vec="cocoon"      ),
-        list(text="International Travel Ban"                , val_vec="tb_vector"     , val_default=0,     bol_vec="travelban"   ),
-        list(text="Vaccination"                             , val_vec="vc_vector"     , val_default=0,     bol_vec="vaccine"     ),
-        list(text="(*Vaccination) Age Vaccine Minimum"      , val_vec="minav_vector"  , val_default=age_vaccine_min              ),
-        list(text="(*Vaccination) Age Vaccine Maximum"      , val_vec="maxav_vector"  , val_default=age_vaccine_max              ),
-        list(text="Mass Testing"                            , val_vec="mt_vector"     , val_default=0,     bol_vec="masstesting" ),
-        list(text="(*Mass Testing) Age Testing Minimum"     , val_vec="minas_vector"  , val_default=age_testing_min              ),
-        list(text="(*Mass Testing) Age Testing Maximum"     , val_vec="maxas_vector"  , val_default=age_testing_max              ),
-        list(text="Dexamethasone"                           ,                                              bol_vec="dex"         )
+        list(text = "Self-isolation if Symptomatic",         val_vec = "si_vector",    val_default = 0,  bol_vec = "isolation"),
+        list(text = "(*Self-isolation) Screening",           val_vec = "scr_vector",   val_default = 0,  bol_vec = "screen"),
+        list(text = "(*Self-isolation) Household Isolation", val_vec = "q_vector",     val_default = 0,  bol_vec = "quarantine"),
+        list(text = "Social Distancing",                     val_vec = "sd_vector",    val_default = 0,  bol_vec = "distancing"),
+        list(text = "Handwashing",                           val_vec = "hw_vector",    val_default = 0,  bol_vec = "handwash"),
+        list(text = "Mask Wearing",                          val_vec = "msk_vector",   val_default = 0,  bol_vec = "masking"),
+        list(text = "Working at Home",                       val_vec = "wah_vector",   val_default = 0,  bol_vec = "workhome"),
+        list(text = "School Closures",                       val_vec = "sc_vector",    val_default = 0,  bol_vec = "schoolclose"),
+        list(text = "Shielding the Elderly",                 val_vec = "cte_vector",   val_default = 0,  bol_vec = "cocoon"),
+        list(text = "International Travel Ban",              val_vec = "tb_vector",    val_default = 0,  bol_vec = "travelban"),
+        list(text = "Vaccination",                           val_vec = "vc_vector",    val_default = 0,  bol_vec = "vaccine"),
+        list(text = "(*Vaccination) Age Vaccine Minimum",    val_vec = "minav_vector", val_default = age_vaccine_min),
+        list(text = "(*Vaccination) Age Vaccine Maximum",    val_vec = "maxav_vector", val_default = age_vaccine_max),
+        list(text = "Mass Testing",                          val_vec = "mt_vector",    val_default = 0,  bol_vec = "masstesting"),
+        list(text = "(*Mass Testing) Age Testing Minimum",   val_vec = "minas_vector", val_default = age_testing_min),
+        list(text = "(*Mass Testing) Age Testing Maximum",   val_vec = "maxas_vector", val_default = age_testing_max),
+        list(text = "Dexamethasone",                                                                     bol_vec = "dex")
     )
 
     intv_vectors <- list()
@@ -67,33 +67,33 @@ read_intervention_schedule <- function(
 
         # default vectors
         ii_val_vec <- rep(0, time_max * steps_per_time)
-        if(!is.null( intv[["val_default"]] )){
+        if (!is.null( intv[["val_default"]] )) {
             ii_val_vec <- rep(intv[["val_default"]], time_max * steps_per_time)
         }
         ii_bol_vec <- rep(0, time_max * steps_per_time)
 
-        ii_rows <- intersect(which(inp[["Intervention"]]==intv[["text"]]),tv)
+        ii_rows <- intersect(which(inp[["Intervention"]] == intv[["text"]]), tv)
 
         if (length(ii_rows) >= 1) {
             prev_t2 <- -10
-            for(rr in ii_rows) {
+            for (rr in ii_rows) {
 
-                t1 <- inp[["Date Start"]][rr]-startdate
-                t2 <- inp[["Date End"]][rr]-startdate
+                t1 <- inp[["Date Start"]][rr] - startdate
+                t2 <- inp[["Date End"]][rr] - startdate
 
-                if (FILL_1DAY_GAP && (t1 == (prev_t2+1))) {
-                    t1 <- t1-1
+                if (fill_day_gap && (t1 == (prev_t2 + 1))) {
+                    t1 <- t1 - 1
                 }
-                prev_t2 = t2
+                prev_t2 <- t2
 
                 stopifnot(t1 >= 0)
                 stopifnot(t2 >= 0)
 
                 if (t1 < t2) {
-                    idx1 = t1*steps_per_time+1
-                    idx2 = t2*steps_per_time
-                    ii_val_vec[idx1:idx2] = inp[["Value"]][rr]
-                    ii_bol_vec[idx1:idx2] = 1
+                    idx1 <- t1 * steps_per_time + 1
+                    idx2 <- t2 * steps_per_time
+                    ii_val_vec[idx1:idx2] <- inp[["Value"]][rr]
+                    ii_bol_vec[idx1:idx2] <- 1
                 }
 
             }
@@ -107,8 +107,8 @@ read_intervention_schedule <- function(
         }
 
     }
-    
-    intv_vectors[["mt_vector"]] <- intv_vectors[["mt_vector"]]*1000
+
+    intv_vectors[["mt_vector"]] <- intv_vectors[["mt_vector"]] * 1000
 
     return(intv_vectors)
 }
