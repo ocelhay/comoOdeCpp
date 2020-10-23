@@ -58,11 +58,17 @@ test_that("Splitting intervention", {
     processed_hype_results$total_cm_deaths_end
   )
 
+  match_outputs(
+    outputA = out_base,
+    outputB = out_hype,
+    tlr = 0.0001,
+    smp = 100
+  )
 
 })
 
 test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
-  skip("temp skip")
+  # skip("temp skip")
 
   rm(list = ls())
   source(paste0(getwd(), "/common.R"), local = environment())
@@ -78,7 +84,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
 
   # environment(check_mortality_count) <- environment()
 
-  p_value_list = seq(0.0, 0.1, by = 0.02)
+  p_value_list = seq(0.0, 0.1, by = 0.025)
   # p_value_list = seq(0.1, 0.1)
 
   scenario_list <- list(
@@ -125,7 +131,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
       expect_equal(
         processed_cpp_results$total_reportable_deaths_end,
         processed_cpp_results$total_cm_deaths_end,
-        tolerance = 0.01,
+        tolerance = 0.1,
         scale = processed_cpp_results$total_cm_deaths_end
       )
 
@@ -143,7 +149,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
       expect_equal(
         processed_r_results$total_reportable_deaths_end,
         processed_r_results$total_cm_deaths_end,
-        tolerance = 0.01,
+        tolerance = 0.1,
         scale = processed_r_results$total_cm_deaths_end
       )
 
@@ -177,36 +183,12 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
       # write.csv(out_cpp, paste0("out_cpp_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
       # write.csv(out_r, paste0("out_r_",sss,"_",parameters["p"],".csv"),row.names = FALSE)
 
-      for (ii in 1:1000) {
-        rr = sample(1:nrow(out_r),1)
-        cc = sample(1:ncol(out_r),1)
-        # print(paste("out_r[rr,cc] =", out_r[rr,cc]))
-        # print(paste("out_cpp[rr,cc] =", out_cpp[rr,cc]))
-
-        expect_gte(out_r[rr,cc], 0) # >=0
-        expect_gte(out_cpp[rr,cc], 0) # >=0
-
-        if (out_r[rr,cc] > 0) {
-
-          res = expect_equal(
-            out_cpp[rr,cc],
-            out_r[rr,cc],
-            tolerance = 0.0001,
-            scale = out_r[rr,cc]
-          )
-
-          if(abs(out_cpp[rr,cc]-out_r[rr,cc])>out_r[rr,cc]*0.0001){
-            print(paste(
-              "not equal: rr=", rr,
-              ", cc=", cc,
-              ", pp=", pp,
-              ", out_r[rr,cc]", out_r[rr,cc],
-              ", out_cpp[rr,cc]", out_cpp[rr,cc]
-            ))
-          }
-
-        }
-      }
+      match_outputs(
+        outputA = out_r,
+        outputB = out_cpp,
+        tlr = 0.0001,
+        smp = 1000
+      )
 
     }
   }

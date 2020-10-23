@@ -36,3 +36,49 @@ check_parameters_list_for_na <- function(parameters_list) {
     }
   }
 }
+
+match_outputs <-function(
+    outputA,      # output matrix #1
+    outputB,      # output matrix #2
+    tlr = 0.0001, # tolerance
+    smp = 1000    # num samples to take
+  ) {
+
+  for (ii in 1:smp) {
+    rr = sample(1:nrow(outputA),1)
+    cc = sample(1:ncol(outputA),1)
+    # print(paste("outputA[rr,cc] =", outputA[rr,cc]))
+    # print(paste("outputB[rr,cc] =", outputB[rr,cc]))
+
+    outA = outputA[rr,cc]
+    outB = outputB[rr,cc]
+
+    expect_true(is.numeric(outA))
+    expect_true(is.numeric(outB))
+
+    expect_gte(outA, 0) # >=0
+    expect_gte(outB, 0) # >=0
+
+    if (outA > 0) {
+
+      res = expect_equal(
+        outB,
+        outA,
+        tolerance = 0.0001,
+        scale = outA
+      )
+
+      if(abs(outB-outA)>outA*0.0001){
+        print(paste(
+          "not equal: rr=", rr,
+          ", cc=", cc,
+          ", pp=", pp,
+          ", outputA[rr,cc]", outA,
+          ", outputB[rr,cc]", outB
+        ))
+      }
+
+    }
+  }
+
+}
