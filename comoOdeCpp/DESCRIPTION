@@ -10,10 +10,10 @@ License: Attribution-NonCommercial 4.0 International
 Depends:
 	stats (>= 3.1.3)
 Imports:
-	Rcpp (>= 1.0.4.6)
+	Rcpp (>= 1.0.4.6),
+	dplyr
 Suggests:
 	testthat,
 	deSolve,
-	dplyr,
 	readxl
 LinkingTo: Rcpp, RcppArmadillo
