@@ -107,14 +107,14 @@ test_that("compare read_intervention_schedule of comoOdeCpp and inputs of como A
     for (ii in c(1, 3)) {
 
         match_processed_outputs(
-            outputA = output_processed_list[[ii]],
-            outputB = output_processed_list[[ii + 1]],
+            output_a = output_processed_list[[ii]],
+            output_b = output_processed_list[[ii + 1]],
             tlr = 0.0001
         )
 
         match_outputs(
-            outputA = output_list[[ii]],
-            outputB = output_list[[ii + 1]],
+            output_a = output_list[[ii]],
+            output_b = output_list[[ii + 1]],
             tlr = 0.0001,
             smp = 100
         )
