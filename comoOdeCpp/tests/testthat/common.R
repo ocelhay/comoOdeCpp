@@ -1,5 +1,6 @@
 
-CORE_FILE <- "/v16.2.core.R"
+# CORE_FILE <- "/v16.2.core.R"
+CORE_FILE <- "/v16.2.core.input_mod.R"
 
 check_libraries <- function() {
   library_list <- list(
