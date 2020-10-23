@@ -4,7 +4,7 @@ test_that("compare read_intervention_schedule of comoOdeCpp and inputs of como A
     source(paste0(getwd(), "/common.R"), local = environment())
     init(e=environment())
 
-    file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_sa.xlsx")
+    file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_io_intv_sched.xlsx")
 
     if (!exists("inputs", mode = "function")) {
     source(paste0(getwd(), CORE_FILE), local = environment())
@@ -35,6 +35,29 @@ test_that("compare read_intervention_schedule of comoOdeCpp and inputs of como A
         age_vaccine_min = parameters["age_vaccine_min"],
         age_vaccine_max = parameters["age_vaccine_max"]
     )
+
+    for (vv in names(vectors0)) {
+        if(!all(vectors0[[vv]] == intv_schd_base[[vv]])){
+            print(vv)
+            print("vectors0[[vv]]")
+            print(vectors0[[vv]])
+            print("intv_schd_base[[vv]]")
+            print(intv_schd_base[[vv]])
+        }
+        expect_true(is.numeric((intv_schd_base[[vv]])))
+        expect_true(all(vectors0[[vv]] == intv_schd_base[[vv]]))
+    }
+    for (vv in names(vectors)) {
+        if(!all(vectors[[vv]] == intv_schd_hype[[vv]])){
+            print(vv)
+            print("vectors[[vv]]")
+            print(vectors[[vv]])
+            print("intv_schd_hype[[vv]]")
+            print(intv_schd_hype[[vv]])
+        }
+        expect_true(is.numeric((intv_schd_hype[[vv]])))
+        expect_true(all(vectors[[vv]] == intv_schd_hype[[vv]]))
+    }
 
 
     check_parameters_list_for_na(parameters)
