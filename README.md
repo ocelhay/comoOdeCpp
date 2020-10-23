@@ -1,9 +1,9 @@
 # comoOdeCpp
 
 [![GitHub release](https://img.shields.io/github/v/release/bogaotory/comoOdeCpp.svg)](https://GitHub.com/bogaotory/comoOdeCpp/releases/)
-[![Build Status](https://travis-ci.org/ocelhay/comoOdeCpp.svg?branch=master)](https://travis-ci.org/ocelhay/comoOdeCpp)
+[![Build Status](https://travis-ci.org/bogaotory/comoOdeCpp.svg?branch=master)](https://travis-ci.org/bogaotory/comoOdeCpp)
 ![Maintenance](https://img.shields.io/maintenance/yes/2020)
-[![CodeFactor](https://www.codefactor.io/repository/github/ocelhay/comoodecpp/badge)](https://www.codefactor.io/repository/github/ocelhay/comoodecpp)
+[![CodeFactor](https://www.codefactor.io/repository/github/bogaotory/comoodecpp/badge)](https://www.codefactor.io/repository/github/bogaotory/comoodecpp)
 [![Codecov](https://img.shields.io/codecov/c/github/bogaotory/comoOdeCpp)](https://codecov.io/gh/bogaotory/comoOdeCpp)
 
 

@@ -6,6 +6,7 @@ warnings_are_errors: false
 
 r_packages:
   - covr
+  - lintr
 
 before_install:
   - cd comoOdeCpp
@@ -17,5 +18,10 @@ global:
 r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual
 
+after_script:
+  - R CMD INSTALL $PKG_TARBALL
+  - Rscript -e 'lintr::lint_package()'
+  
 after_success:
   - Rscript -e 'library(covr);codecov()'
+  - Rscript -e 'covr::coveralls()'

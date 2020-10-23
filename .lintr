@@ -1,1 +1,1 @@
-exclusions: list("r_versions", "comoOdeCpp/tests/testthat/v13.13.core.R", "comoOdeCpp/R/RcppExports.R")
+exclusions: list("r_versions", "comoOdeCpp/tests/testthat/v16.2.core.R", "comoOdeCpp/tests/testthat/v16.2.core.input_mod.R", "comoOdeCpp/R/RcppExports.R")
