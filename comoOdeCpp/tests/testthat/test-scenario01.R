@@ -5,7 +5,7 @@ test_that("Splitting intervention", {
   source(paste0(getwd(), "/common.R"), local = environment())
   init(e=environment())
 
-  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1_intv_split.xlsx")
+  file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_intv_split.xlsx")
 
   # if (!exists("inputs", mode = "function")) {
     source(paste0(getwd(), CORE_FILE), local = environment())
@@ -74,7 +74,7 @@ test_that("Matching Rcpp and R version at p={0.00,0.01, ... 0.1}", {
   source(paste0(getwd(), "/common.R"), local = environment())
   init(e=environment())
   
-  file_path <- paste0(getwd(), "/data/Template_CoMoCOVID-19App_new_16.1.xlsx")
+  file_path <- paste0(getwd(), "/data/templates_v16.2/Template_CoMoCOVID-19App_r_v_cpp.xlsx")
 
   if (!exists("inputs", mode = "function")) {
     source(paste0(getwd(), CORE_FILE), local = environment())
