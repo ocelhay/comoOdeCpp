@@ -1,1 +1,2 @@
+linters: with_defaults(line_length_linter(120))
 exclusions: list("r_versions", "comoOdeCpp/tests/testthat/v16.2.core.R", "comoOdeCpp/tests/testthat/v16.2.core.input_mod.R", "comoOdeCpp/R/RcppExports.R")
