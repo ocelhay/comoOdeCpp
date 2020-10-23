@@ -1,8 +1,8 @@
 Package: comoOdeCpp
 Type: Package
 Title: Cpp version of CoMo Consortium's COVID-19 transmission model
-Version: 15.3.3
-Date: 2020-09-04
+Version: 16.2.1
+Date: 2020-10-23
 Author: Ricardo Aguas, Bo Gao, Sompob Saralamba
 Maintainer: Bo Gao <bo.gao@ndm.ox.ac.uk>
 Description: Cpp version of CoMo Consortium's COVID-19 transmission model
@@ -10,10 +10,10 @@ License: Attribution-NonCommercial 4.0 International
 Depends:
 	stats (>= 3.1.3)
 Imports:
-	Rcpp (>= 1.0.4.6)
+	Rcpp (>= 1.0.4.6),
+	dplyr
 Suggests:
 	testthat,
 	deSolve,
-	dplyr,
 	readxl
 LinkingTo: Rcpp, RcppArmadillo

@@ -43,7 +43,7 @@ names(dta) <- c("age_category",	"ifr",	"ihr")
 
 mort_sever_rv <- dta %>%
   mutate(ihr = ihr/100) %>% # starting unit should be % - scaling to a value between 0 and 1
-  mutate(ifr = ifr/max(ifr))  # starting unit should be % - scaling to a value between 0 and 1
+  mutate(ifr = ifr/max(ifr))  # scaling to a value between 0 and 1
 
 # Population
 dta <- read_excel(file_path, sheet = "Population")
@@ -160,6 +160,7 @@ aci <- floor((ageindcase/5)+1) # age class of index case
 
 #############   DEFINE PARAMETERS
 parameters <- c(
+  
   ###  Transmission instrinsic
   p = param$Value[param$Parameter=="p"][1],
   rho = param$Value[param$Parameter=="rho"][1],
@@ -202,6 +203,37 @@ parameters <- c(
   dexv = mean( param$Value[param$Parameter=="dexvc"],na.rm=T),
   dexvc = mean( param$Value[param$Parameter=="dexvc"],na.rm=T),
   vent_dex = mean(param$Value[param$Parameter=="vent_dex"],na.rm=T),
+  prob_icu_v = mean(param$Value[param$Parameter=="prob_icu_v"],na.rm=T),
+  prob_icu_vr = mean(param$Value[param$Parameter=="prob_icu_vr"],na.rm=T),
+  prob_icu_r = mean(param$Value[param$Parameter=="prob_icu_r"],na.rm=T),
+  prob_v_v = mean(param$Value[param$Parameter=="prob_v_v"],na.rm=T),
+  prob_v_vr = mean(param$Value[param$Parameter=="prob_v_vr"],na.rm=T),
+  prob_v_r = mean(param$Value[param$Parameter=="prob_v_r"],na.rm=T),
+  pclin_v = mean(param$Value[param$Parameter=="pclin_v"],na.rm=T),
+  pclin_vr = mean(param$Value[param$Parameter=="pclin_vr"],na.rm=T),
+  pclin_r = mean(param$Value[param$Parameter=="pclin_r"],na.rm=T),
+  sigmaEV = mean(param$Value[param$Parameter=="sigmaEV"],na.rm=T),
+  sigmaEVR = mean(param$Value[param$Parameter=="sigmaEVR"],na.rm=T),
+  sigmaER = mean(param$Value[param$Parameter=="sigmaER"],na.rm=T),
+  sigmaR = mean(param$Value[param$Parameter=="sigmaR"],na.rm=T),
+  vac_dur = mean(param$Value[param$Parameter=="vac_dur"],na.rm=T),
+  vac_dur_r = mean(param$Value[param$Parameter=="vac_dur_r"],na.rm=T),
+  report_natdeathI = mean(param$Value[param$Parameter=="report_natdeathI"],na.rm=T),
+  report_natdeathCL = mean(param$Value[param$Parameter=="report_natdeathCL"],na.rm=T),
+  pre = mean(param$Value[param$Parameter=="pre"],na.rm=T),
+  report_v = param$Value[param$Parameter=="report_v"][1],
+  report_cv = param$Value[param$Parameter=="report_cv"][1],
+  report_vr = param$Value[param$Parameter=="report_vr"][1],
+  report_cvr = param$Value[param$Parameter=="report_cvr"][1],
+  report_r = param$Value[param$Parameter=="report_r"][1],
+  report_cr = param$Value[param$Parameter=="report_cr"][1],
+  reporth_ICU = param$Value[param$Parameter=="reporth_ICU"][1],
+  report_death_HC = param$Value[param$Parameter=="report_death_HC"][1],
+  pdeath_vent_hc = mean( param$Value[param$Parameter=="pdeath_vent_hc"],na.rm=T),
+  pdeath_icu_hc = mean( param$Value[param$Parameter=="pdeath_icu_hc"],na.rm=T),
+  pdeath_icu_hco = mean( param$Value[param$Parameter=="pdeath_icu_hco"],na.rm=T),
+  reporth_g = param$Value[param$Parameter=="reporth_g"][1],
+  seroneg = param$Value[param$Parameter=="seroneg"][1],
   
   ###  INTERVENTIONS
   # self isolation
@@ -224,7 +256,9 @@ parameters <- c(
   # vaccination campaign
   # vaccine_on = as.numeric(param$Value_Date[param$Parameter=="date_vaccine_on"] - startdate),
   vaccine_eff = mean(param$Value[param$Parameter=="vaccine_eff"],na.rm=T),
+  vaccine_eff_r = mean(param$Value[param$Parameter=="vaccine_eff_r"],na.rm=T),
   age_vaccine_min = mean(param$Value[param$Parameter=="age_vaccine_min"],na.rm=T),
+  age_vaccine_max = mean(param$Value[param$Parameter=="age_vaccine_max"],na.rm=T),
   # vaccine_cov = param$Value[param$Parameter=="vaccine_cov"],
   vac_campaign = mean(param$Value[param$Parameter=="vac_campaign"],na.rm=T),
   # travel ban
@@ -244,6 +278,10 @@ parameters <- c(
   mass_test_sens = mean(param$Value[param$Parameter=="mass_test_sens"],na.rm=T),
   isolation_days = mean(param$Value[param$Parameter=="isolation_days"],na.rm=T),
   
+  ###  Initialisation
+  init = param$Value[param$Parameter=="init"][1],
+  
+  ### Others
   household_size = param$Value[param$Parameter=="household_size"][1],
   noise = param$Value[param$Parameter=="noise"][1],
   iterations = param$Value[param$Parameter=="iterations"][1],
@@ -258,6 +296,12 @@ parameters["gamma"]<-1/parameters["gamma"]
 parameters["nui"]<-1/parameters["nui"]
 parameters["report"]<-parameters["report"]/100
 parameters["reportc"]<-parameters["reportc"]/100
+parameters["report_v"]<-parameters["report_v"]/100
+parameters["report_cv"]<-parameters["report_cv"]/100
+parameters["report_vr"]<-parameters["report_vr"]/100
+parameters["report_cvr"]<-parameters["report_cvr"]/100
+parameters["report_r"]<-parameters["report_r"]/100
+parameters["report_cr"]<-parameters["report_cr"]/100
 parameters["reporth"]<-parameters["reporth"]/100
 parameters["nus"]<-1/parameters["nus"]
 parameters["rhos"]<-parameters["rhos"]/100
@@ -273,7 +317,9 @@ parameters["s2h"]<-parameters["s2h"]/100
 parameters["cocoon_eff"]<-parameters["cocoon_eff"]/100
 parameters["age_cocoon"]<-floor((parameters["age_cocoon"]/5)+1)
 parameters["vaccine_eff"]<-parameters["vaccine_eff"]/100
+parameters["vaccine_eff_r"]<-parameters["vaccine_eff_r"]/100
 age_vaccine_min<-(parameters["age_vaccine_min"])
+age_vaccine_max<-(parameters["age_vaccine_max"])
 # parameters["vaccine_cov"]<-parameters["vaccine_cov"]/100
 # parameters["vac_campaign"]<-parameters["vac_campaign"]*7
 parameters["screen_test_sens"]<-parameters["screen_test_sens"]/100
@@ -300,7 +346,6 @@ parameters["nu_ventc"]<-1/parameters["nu_ventc"]
 parameters["pclin"]<-parameters["pclin"]/100
 parameters["prob_icu"]<-parameters["prob_icu"]/100
 parameters["prob_vent"]<-parameters["prob_vent"]/100
-parameters_noise<-c(1:5,19:20,22,24,26,32:39,43,45,47:49)
 iterations<-parameters["iterations"]
 noise<-parameters["noise"]
 confidence<-parameters["confidence"]/100
@@ -314,6 +359,38 @@ parameters["dexo2c"]<-parameters["dexo2c"]/100
 parameters["dexv"]<-parameters["dexv"]/100
 parameters["dexvc"]<-parameters["dexvc"]/100
 parameters["vent_dex"]<-parameters["vent_dex"]/100
+parameters["prob_icu_v"]<-parameters["prob_icu_v"]/100
+parameters["prob_icu_vr"]<-parameters["prob_icu_vr"]/100
+parameters["prob_icu_r"]<-parameters["prob_icu_r"]/100
+parameters["prob_v_v"]<-parameters["prob_v_v"]/100
+parameters["prob_v_r"]<-parameters["prob_v_r"]/100
+parameters["prob_v_vr"]<-parameters["prob_v_vr"]/100
+parameters["pclin_v"]<-parameters["pclin_v"]/100
+parameters["pclin_vr"]<-parameters["pclin_vr"]/100
+parameters["pclin_r"]<-parameters["pclin_r"]/100
+parameters["sigmaEV"]<-parameters["sigmaEV"]/100
+parameters["sigmaER"]<-parameters["sigmaER"]/100
+parameters["sigmaEVR"]<-parameters["sigmaEVR"]/100
+parameters["sigmaR"]<-parameters["sigmaR"]/100
+parameters["vac_dur"]<-1/parameters["vac_dur"]/100
+parameters["vac_dur_r"]<-1/parameters["vac_dur_r"]/100
+parameters["report_natdeathI"]<-parameters["report_natdeathI"]/100
+parameters["report_natdeathCL"]<-parameters["report_natdeathCL"]/100
+parameters["report_death_HC"]<-parameters["report_death_HC"]/100
+parameters["reporth_ICU"]<-parameters["reporth_ICU"]/100
+parameters["pre"]<-parameters["pre"]/100
+parameters["pdeath_vent_hc"]<-parameters["pdeath_vent_hc"]/100
+parameters["pdeath_icu_hc"]<-parameters["pdeath_icu_hc"]/100
+parameters["pdeath_icu_hco"]<-parameters["pdeath_icu_hco"]/100
+parameters["reporth_g"]<-parameters["reporth_g"]/100
+parameters["seroneg"]<-(1/parameters["seroneg"])
+
+
+# parameters_noise<-c(1:5,19:20,22,24,26,32:39,43,45,47:49,66)
+parameters_noise <- c("p", "rho", "omega", "gamma", "nui", "ihr_scaling","nus", "nu_icu","nu_vent",
+                      "rhos", "selfis_eff", "dist_eff", "hand_eff", "mask_eff", "work_eff", 
+                      "w2h", "school_eff", "s2h", "cocoon_eff", "mean_imports", "screen_overdispersion", 
+                      "quarantine_effort", "quarantine_eff_home", "quarantine_eff_other")
 
 ###########################################################################
 # Define the indices for each variable
@@ -340,13 +417,26 @@ Ventindex<-(19*A+1):(20*A)
 VentCindex<-(20*A+1):(21*A)
 CMCindex<-(21*A+1):(22*A)
 Zindex<-(22*A+1):(23*A)
+EVindex<-(23*A+1):(24*A)
+ERindex<-(24*A+1):(25*A)
+EVRindex<-(25*A+1):(26*A)
+VRindex<-(26*A+1):(27*A)
+QVindex<-(27*A+1):(28*A)
+QEVindex<-(28*A+1):(29*A)
+QEVRindex<-(29*A+1):(30*A)
+QERindex<-(30*A+1):(31*A)
+QVRindex<-(31*A+1):(32*A)
+HCICUindex<-(32*A+1):(33*A)
+HCVindex<-(33*A+1):(34*A)
+Abindex<-(34*A+1):(35*A)
 
 ###########################################################################
 # MODEL INITIAL CONDITIONS
 initI<-0*popstruc[,2]  # Infected and symptomatic
 initE<-0*popstruc[,2]  # Incubating
-initE[aci]<-1          # place random index case in E compartment
-initR<-0*popstruc[,2]  # Immune
+# initE[aci]<-1          # place random index case in E compartment
+initE[aci]<-round(sum(popstruc[,2])/parameters["init"])     # place random index case in E compartment
+initR<-parameters["pre"]*popstruc[,2]  # Immune
 initX<-0*popstruc[,2]  # Isolated 
 initV<-0*popstruc[,2]  # Vaccinated 
 initQS<-0*popstruc[,2] # quarantined S 
@@ -361,18 +451,32 @@ initCL<-0*popstruc[,2] # symptomatic cases
 initQC<-0*popstruc[,2] # quarantined C 
 initICU<-0*popstruc[,2]   # icu
 initICUC<-0*popstruc[,2]  # icu critical
-initICUCV<-0*popstruc[,2]  # icu critical
+initICUCV<-0*popstruc[,2] # icu critical
 initVent<-0*popstruc[,2]  # icu vent
 initVentC<-0*popstruc[,2] # icu vent crit
-initCMC<-0*popstruc[,2]   # Cumulative deaths (true)
-initZ<-0*popstruc[,2]   # Cumulative deaths (true)
-initS<-popstruc[,2]-initE-initI-initR-initX-initZ-initV-initH-initHC-initQS-initQE-initQI-initQR-initCL-initQC-initICU-initICUC-initICUCV-initVent-initVentC  # Susceptible (non-immune)
+initCMC<-0*popstruc[,2]   # Cumulative deaths - overload (true)
+initZ<-0*popstruc[,2]     # testing - quarantined (true)
+initEV<-0*popstruc[,2]    # vaccinated exposed
+initER<-0*popstruc[,2]    # recovered exposed
+initEVR<-0*popstruc[,2]   # recovered and vaccinated exposed
+initVR<-0*popstruc[,2]    # recovered and vaccinated
+initQV<-0*popstruc[,2]    # quarantined and vaccinated
+initQEV<-0*popstruc[,2]   # quarantined, exposed and vaccinated
+initQEVR<-0*popstruc[,2]  # quarantined, exposed, recovered and vaccinated
+initQER<-0*popstruc[,2]   # quarantined, exposed and recovered
+initQVR<-0*popstruc[,2]   # quarantined, recovered and vaccinated
+initHCICU<-0*popstruc[,2] # icu not seeking
+initHCV<-0*popstruc[,2]   # ventilator not seeking
+initAb<-0*popstruc[,2]   # ventilator not seeking
+
+initS<-popstruc[,2]-initE-initI-initCL-initR-initX-initZ-initV-initH-initHC-initICU-initICUC-initICUCV-initVent-initVentC-
+  initQS-initQE-initQI-initQR-initQC-initEV-initER-initEVR-initVR-initQV-initQEV-initQEVR-initQER-initQVR-
+  initHCICU-initHCV # Susceptible (non-immune)
 
 
 inp <- read_excel(file_path, sheet = "Interventions")
 inputs<-function(inp, run){
   # cap intervention end dates with simulation end date
-  # inp$`Date End` = pmin(stopdate, inp$`Date End`)
   inp$`Date End` = pmin(stopdate, as.Date(inp$`Date End`))
   
   tv<-which(inp$`Apply to`==run)
@@ -393,6 +497,7 @@ inputs<-function(inp, run){
   maxas<-intersect(which(inp$Intervention=="Age Testing Maximum"),tv)
   vc<-intersect(which(inp$Intervention=="Vaccination"),tv)
   minav<-intersect(which(inp$Intervention=="Age Vaccine Minimum"),tv)
+  maxav<-intersect(which(inp$Intervention=="Age Vaccine Maximum"),tv)
   dx<-intersect(which(inp$Intervention=="Dexamethasone"),tv)
   
   v<-(format(as.POSIXct(inp$`Date Start`,format='%Y/%m/%d %H:%M:%S'),format="%d/%m/%y"))
@@ -911,11 +1016,36 @@ inputs<-function(inp, run){
   }else{
     minav_vector<-rep(age_vaccine_min,tail(times,1)*20)
   }
+  ## max age vaccine
+  f<-c()
+  maxav_vector<-c()
+  if (length(maxav)>=1){
+    for (i in 1:length(maxav)){
+      f<-c(f,as.numeric(inp$`Date Start`[maxav[i]]-startdate),as.numeric(inp$`Date End`[maxav[i]]-startdate))
+      if(i==1){
+        if (inp$`Date Start`[maxav[i]]>startdate){
+          maxav_vector<-c(rep(age_vaccine_max,f[i]*20),rep(inp$`Value`[maxav[i]],(f[i+1]-f[i])*20))
+        }
+        else{
+          maxav_vector<-c(rep(inp$`Value`[maxav[i]],(f[i+1])*20))
+        }
+      }
+      else{
+        maxav_vector<-c(maxav_vector,rep(age_vaccine_max,(f[(i-1)*2+1]-f[(i-1)*2])*20))
+        maxav_vector<-c(maxav_vector,rep(inp$`Value`[maxav[i]],(f[i*2]-f[i*2-1])*20))
+      }
+      if(i==length(maxav)&& f[i*2]<tail(times,1)){
+        maxav_vector<-c(maxav_vector,rep(age_vaccine_max,(tail(times,1)-f[i*2])*20))
+      }
+    }
+  }else{
+    maxav_vector<-rep(age_vaccine_max,tail(times,1)*20)
+  }
   return(list(si_vector=si_vector,sd_vector=sd_vector,scr_vector=scr_vector,hw_vector=hw_vector,msk_vector=msk_vector,wah_vector=wah_vector,
               sc_vector=sc_vector,tb_vector=tb_vector,mt_vector=mt_vector,cte_vector=cte_vector,q_vector=q_vector,vc_vector=vc_vector,isolation=isolation,
               screen=screen,cocoon=cocoon,schoolclose=schoolclose,workhome=workhome,handwash=handwash,masking=masking,
               quarantine=quarantine,vaccine=vaccine,travelban=travelban,distancing=distancing,masstesting=masstesting,
-              maxas_vector=maxas_vector,minas_vector=minas_vector,minav_vector=minav_vector, dex=dex))
+              maxas_vector=maxas_vector,minas_vector=minas_vector,minav_vector=minav_vector,maxav_vector=maxav_vector, dex=dex))
 }
 vectors0<-inputs(inp,'Baseline (Calibration)')
 vectors<-inputs(inp,'Hypothetical Scenario')
@@ -961,14 +1091,44 @@ covid<-function(t, Y, parameters,input)
          Vent <- Y[Ventindex]
          VentC <- Y[VentCindex]
          CMC <- Y[CMCindex]
-         P <- (S+E+I+R+X+Z+V+H+HC+QS+QE+QI+QR+CL+QC+ICU+ICUC+ICUCV+Vent+VentC)
-         Q <- (sum(QS)+sum(QE)+sum(QI)+sum(QC)+sum(QR))/sum(P)
-         # print(sum(P))
+         EV <- Y[EVindex]
+         ER <- Y[ERindex]
+         EVR <- Y[EVRindex]
+         VR <- Y[VRindex]
+         QV <- Y[QVindex]
+         QEV <- Y[QEVindex]
+         QER <- Y[QERindex]
+         QEVR <- Y[QEVRindex]
+         QVR <- Y[QVRindex]
+         HCICU <- Y[HCICUindex]
+         HCV <- Y[HCVindex]
+         Ab <- Y[Abindex]
          
+         P <- (S+E+I+R+X+Z+V+H+HC+ICU+ICUC+ICUCV+Vent+VentC+EV+ER+EVR+VR+HCICU+HCV+
+                 QS+QE+QI+QR+CL+QC+QEV+QV+QER+QEVR+QVR)
+         Q <- (sum(QS)+sum(QE)+sum(QI)+sum(QC)+sum(QR)+sum(QV)+sum(QER)+sum(QEVR)+sum(QEV)+sum(QVR))/sum(P)
+         # print(HCICUindex)
+         # print(sum(ER))
+         # print(t)
+         # print(paste("EVR",sum(QE)))
+         # print(paste("ER",sum(QR)))
+         # print(paste("QER",sum(QER)))
+         # print(paste("QEVR",sum(QEVR)))
+         # print(paste("QV",sum(QV)))
+         # print(paste("QC",sum(QC)))
+         # print(paste("QI",sum(QI)))
+         # print(paste("QEV",sum(QV)))
+         # print(paste("QE",sum(QC)))
+         # print(paste("QR",sum(QR)))
          # health system performance
          critH<-min(1-fH(sum(H)+sum(ICUC)+sum(ICUCV)),1)
          crit<-min(1-fICU(sum(ICU)+sum(Vent)+sum(VentC)),1)
          critV<-min(1-fVent(sum(Vent)),1)
+         
+   to_keep = 10000000
+   critH <- round(critH * to_keep) / to_keep
+   crit  <- round(crit  * to_keep) / to_keep
+   critV <- round(critV * to_keep) / to_keep
          
          # interventions
          isolation<-input$isolation[t*20+1]
@@ -1012,10 +1172,13 @@ covid<-function(t, Y, parameters,input)
          max_age_testing<-floor((input$maxas_vector[t*20+1]/5)+1)
          age_testing_vector<-c(rep(0,min_age_testing-1),rep(1,max_age_testing-min_age_testing+1),rep(0,21-max_age_testing))
          min_age_vaccine<-floor((input$minav_vector[t*20+1]/5)+1)
+         max_age_vaccine<-floor((input$maxav_vector[t*20+1]/5)+1)
          if (vaccine){
-           age_vaccine_vector<-c(rep(0,min_age_vaccine-1),rep(1,21-min_age_vaccine+1))
+           age_vaccine_vector<-c(rep(0,min_age_vaccine-1),rep(1,max_age_vaccine-min_age_vaccine+1),rep(0,21-max_age_vaccine))
+           vac_rate<-(-log(1-vaccine_cov)/vac_campaign)
+           vaccinate<-vac_rate
          }else{age_vaccine_vector<-rep(0,A)}
-         # print(age_testing_vector)
+         # print(vaccinate*age_vaccine_vector)
          
          if (workhome){
            work<-work_cov*work_eff
@@ -1023,7 +1186,7 @@ covid<-function(t, Y, parameters,input)
          if (isolation){
            selfis<-selfis_cov
            if(screen){
-             screen_eff<-min(sum(report*I+reportc*(CL)+H+ICU+Vent+reporth*(HC+ICUC+ICUCV+VentC))*screen_contacts*(screen_overdispersion*I/P)*screen_test_sens/P,1) 
+             screen_eff<-min(sum(report*I+reportc*(CL)+H+ICU+Vent+reporth*(HC+ICUC+ICUCV+VentC+HCICU+HCV))*screen_contacts*(screen_overdispersion*I/P)*screen_test_sens/P,1) 
            }
          }
          if (schoolclose){
@@ -1038,15 +1201,11 @@ covid<-function(t, Y, parameters,input)
          if(masking){
            mask<-mask_eff*mask_cov
          }
-         if(vaccine){
-           vac_rate<-(-log(1-vaccine_cov)/vac_campaign)
-           vaccinate<-vac_rate
-         }
          if(travelban){
            trvban_eff<-travelban_eff
          }
          if(quarantine){
-           rate_q<-min((min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC))*(household_size-1)/sum(P),1)*quarantine_effort),quarantine_cov/2)
+           rate_q<-min((min(sum((I+CL+H+ICU+Vent+HC+ICUC+ICUCV+VentC+HCV+HCICU))*(household_size-1)/sum(P),1)*quarantine_effort),quarantine_cov/2)
            quarantine_rate<-rate_q/(1+exp(-10*(quarantine_cov/2-Q)))
          }
          if(dexamethasone){
@@ -1055,14 +1214,33 @@ covid<-function(t, Y, parameters,input)
            dexo2<-1;dexo2c<-1;dexv<-1;dexvc<-1;prob_v<-prob_vent;
          }
          # print(paste(dexo2,dexo2c,dexv,dexvc,prob_v))
+         # print(paste("quarantine_rate",quarantine_rate))
+         # print(quarantine_rate*sum(R))
+         # print(quarantine_rate*ER)
+         # 
+         # print(sum(vaccinate*age_vaccine_vector*R))
+         # print((1/quarantine_days)*sum(QR))
          
          # testing rates
          propI<-sum(I)/sum(P)
          propC<-sum(CL)/sum(P)
          propE<-sum(E)/sum(P)
+         propEV<-sum(EV)/sum(P)
+         propER<-sum(ER)/sum(P)
+         propEVR<-sum(EVR)/sum(P)
+         propHC<-sum(HC)/sum(P)
+         propHCICU<-sum(HCICU)/sum(P)
+         propHCV<-sum(HCV)/sum(P)
          testE<-tests_per_day*propE
+         testEV<-tests_per_day*propEV
+         testER<-tests_per_day*propER
+         testEVR<-tests_per_day*propEVR
          testI<-tests_per_day*propI
          testC<-tests_per_day*propC
+         testHC<-tests_per_day*propHC
+         testHCICU<-tests_per_day*propHCICU
+         testHCV<-tests_per_day*propHCV
+         
          if(sum(I)>1){
            ratetestI<-mass_test_sens*testI/sum(I)
            # print(paste('rateI: ',ratetestI))
@@ -1071,10 +1249,30 @@ covid<-function(t, Y, parameters,input)
            ratetestC<-mass_test_sens*testC/sum(CL)
            # print(paste('rateC: ',ratetestC))
          }else{ratetestC<-0}
+         # print(sum(E))
          if(sum(E)>1){
            ratetestE<-mass_test_sens*testE/sum(E)
-           # print(paste('rateC: ',ratetestC))
          }else{ratetestE<-0}
+         if(sum(EV)>1){
+           ratetestEV<-mass_test_sens*testEV/sum(EV)
+           # print(paste('rateEV: ',ratetestEV))
+         }else{ratetestEV<-0}
+         if(sum(ER)>1){
+           ratetestER<-mass_test_sens*testER/sum(ER)
+           # print(paste('rateER: ',ratetestER))
+         }else{ratetestER<-0}
+         if(sum(EVR)>1){
+           ratetestEVR<-mass_test_sens*testEVR/sum(EVR)
+         }else{ratetestEVR<-0}
+         if(sum(HC)>1){
+           ratetestHC<-mass_test_sens*testHC/sum(HC)
+         }else{ratetestHC<-0}
+         if(sum(HCICU)>1){
+           ratetestHCICU<-mass_test_sens*testHCICU/sum(HCICU)
+         }else{ratetestHCICU<-0}
+         if(sum(HCV)>1){
+           ratetestHCV<-mass_test_sens*testHCV/sum(HCV)
+         }else{ratetestHCV<-0}
          
          # print(mass_test_sens)
          # print(ratetestI*sum(I) + ratetestC*sum(CL) - (1/isolation_days)*sum(Z) )
@@ -1101,12 +1299,16 @@ covid<-function(t, Y, parameters,input)
          seas <- 1+amp*cos(2*3.14*(t-(phi*365.25/12))/365.25)
          importation <- mean_imports*(1-trvban_eff)
          HH<-H+ICU+Vent+ICUC+ICUCV+VentC
-         HHC<-HC
+         HHC<-HC+HCICU+HCV
          lam <- (1-max(hand,mask))*p*seas*(contacts%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC)+rhos*(HH))/P))+
-           (1-hand)*p*seas*(1-quarantine*quarantine_eff_other)*(contact_other%*%((rho*QE+QI+QC)/P))
+           (1-max(hand,mask))*p*seas*(1-quarantine*quarantine_eff_other)*(contact_other%*%((rho*QE+QI+QC+QEV+QEVR+QER)/P))
          # contacts under home quarantine
-         lamq<-(1-max(hand,mask))*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC+rho*QE+QI+QC))/P))+
-           (1-hand)*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC+rho*QE+QI+QC)+rhos*(HH))/P))
+         lamq<-(1-max(hand,mask))*p*seas*((1-quarantine_eff_home)*contact_home%*%(((1-selfis_eff)*(X+HHC+rho*QE+QI+QC++QEV+QEVR+QER))/P))+
+           (1-max(hand,mask))*p*seas*(1-quarantine_eff_other)*(contact_other%*%((rho*E+(I+CL+importation)+(1-selfis_eff)*(X+HHC+rho*QE+QI+QC++QEV+QEVR+QER)+rhos*(HH))/P))
+         # lamq<-0
+         # print(paste("lamq",lamq))
+         # print(paste("lamq",(1-vaccine_eff_r)*lamq*sum(QVR) ))
+         # print(paste("quarantine evr",quarantine_rate*sum(EVR) ))
          
          # birth/death
          b1<-sum(popbirth[,2]*popstruc[,2])
@@ -1114,54 +1316,433 @@ covid<-function(t, Y, parameters,input)
          birth[1]<-b1
          
          # ODE system
-         dSdt <- -S*lam-vaccinate*age_vaccine_vector*S+omega*R+ageing%*%S-mort*S+birth-quarantine_rate*S +(1/quarantine_days)*QS
-         dEdt <- S*lam-gamma*E+ageing%*%E-mort*E + (1-vaccine_eff)*lam*V-quarantine_rate*E+(1/quarantine_days)*QE
-         dIdt <- gamma*(1-pclin)*(1-age_testing_vector*ratetestE)*(1-screen_eff)*(1-ihr[,2])*E-nui*I+ageing%*%I-mort*I + (1/quarantine_days)*QI - quarantine_rate*I - ratetestI*age_testing_vector*I
-         dCLdt<- gamma*pclin*(1-age_testing_vector*ratetestE)*(1-selfis)*(1-ihr[,2])*(1-quarantine_rate)*E-nui*CL+ageing%*%CL-mort*CL  + (1/quarantine_days)*QC - ratetestC*age_testing_vector*CL
-         dRdt <- nui*I-omega*R+nui*X+nui*CL+ageing%*%R-mort*R + (1/isolation_days)*Z+(1/quarantine_days)*QR+ 
-           nus*propo2*(1-dexo2*pdeath_ho)*ifr[,2]*H+nus*(1-propo2)*(1-pdeath_h)*ifr[,2]*H+nusc*propo2*(1-pdeath_hco)*ifr[,2]*HC+nusc*(1-propo2)*(1-pdeath_hc)*ifr[,2]*HC+           
-           nu_icu*propo2*(1-dexo2*pdeath_icuo)*ifr[,2]*ICU+nu_icu*(1-propo2)*(1-pdeath_icu)*ifr[,2]*ICU+nu_icuc*propo2*(1-dexo2c*pdeath_icuco)*ifr[,2]*ICUC+nu_icuc*(1-propo2)*(1-pdeath_icuc)*ifr[,2]*ICUC+
-           nu_vent*(1-dexv*pdeath_vent)*ifr[,2]*Vent+nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*VentC+nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*ICUCV 
-         dXdt <- gamma*selfis*(1-age_testing_vector*ratetestE)*pclin*(1-ihr[,2])*E+gamma*(1-pclin)*(1-age_testing_vector*ratetestE)*screen_eff*(1-ihr[,2])*E-nui*X+ageing%*%X-mort*X 
-         dVdt <- vaccinate*age_vaccine_vector*S -(1-vaccine_eff)*lam*V +ageing%*%V - mort*V
+         dSdt <- -S*lam-vaccinate*age_vaccine_vector*S+omega*R+vac_dur*V-
+           quarantine_rate*S +(1/quarantine_days)*QS+ageing%*%S-mort*S+birth
+         dEdt <- S*lam-gamma*E+ageing%*%E- vaccinate*age_vaccine_vector*E - mort*E -
+           quarantine_rate*E+(1/quarantine_days)*QE
+         dIdt <- gamma*(1-pclin)*(1-age_testing_vector*ratetestE)*(1-screen_eff)*(1-ihr[,2])*E+
+           gamma*(1-pclin_v)*(1-age_testing_vector*ratetestEV)*(1-screen_eff)*(1-sigmaEV*ihr[,2])*EV+
+           gamma*(1-pclin_vr)*(1-age_testing_vector*ratetestEVR)*(1-screen_eff)*(1-sigmaEVR*ihr[,2])*EVR+
+           gamma*(1-pclin_r)*(1-age_testing_vector*ratetestER)*(1-screen_eff)*(1-sigmaER*ihr[,2])*ER-
+           vaccinate*age_vaccine_vector*I - nui*I+ageing%*%I-mort*I + 
+           (1/quarantine_days)*QI - quarantine_rate*I - ratetestI*age_testing_vector*I
+         dCLdt<- gamma*pclin*(1-age_testing_vector*ratetestE)*(1-selfis)*(1-ihr[,2])*(1-quarantine_rate)*E+
+           gamma*pclin_v*(1-age_testing_vector*ratetestEV)*(1-selfis)*(1-sigmaEV*ihr[,2])*(1-quarantine_rate)*EV+
+           gamma*pclin_vr*(1-age_testing_vector*ratetestEVR)*(1-selfis)*(1-sigmaEVR*ihr[,2])*(1-quarantine_rate)*EVR+
+           gamma*pclin_r*(1-age_testing_vector*ratetestER)*(1-selfis)*(1-sigmaER*ihr[,2])*(1-quarantine_rate)*ER-
+           nui*CL+ageing%*%CL-mort*CL  + (1/quarantine_days)*QC - ratetestC*age_testing_vector*CL
+         dRdt <- vac_dur_r*VR-omega*R-vaccinate*age_vaccine_vector*R-lam*sigmaR*R - quarantine_rate*R+
+           nui*I+nui*X+nui*CL+ageing%*%R-mort*R + (1/isolation_days)*Z+(1/quarantine_days)*QR+ 
+           nus*propo2*(1-dexo2*pdeath_ho)*ifr[,2]*H+nus*(1-propo2)*(1-pdeath_h)*ifr[,2]*H+
+           nusc*propo2*(1-pdeath_hco)*ifr[,2]*HC+nusc*(1-propo2)*(1-pdeath_hc)*ifr[,2]*HC+  
+           nusc*propo2*(1-pdeath_icu_hco)*ifr[,2]*HCICU+nusc*(1-propo2)*(1-pdeath_icu_hc)*ifr[,2]*HCICU+
+           nu_icu*propo2*(1-dexo2*pdeath_icuo)*ifr[,2]*ICU+nu_icu*(1-propo2)*(1-pdeath_icu)*ifr[,2]*ICU+
+           nu_icuc*propo2*(1-dexo2c*pdeath_icuco)*ifr[,2]*ICUC+nu_icuc*(1-propo2)*(1-pdeath_icuc)*ifr[,2]*ICUC+
+           nu_vent*(1-dexv*pdeath_vent)*ifr[,2]*Vent+
+           nu_ventc*(1-pdeath_vent_hc)*ifr[,2]*HCV+
+           nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*VentC+nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*ICUCV 
+         dXdt <- gamma*selfis*(1-age_testing_vector*ratetestE)*pclin*(1-ihr[,2])*E+
+           gamma*(1-pclin)*(1-age_testing_vector*ratetestE)*screen_eff*(1-ihr[,2])*E+
+           gamma*selfis*(1-age_testing_vector*ratetestEV)*pclin_v*(1-sigmaEV*ihr[,2])*EV+
+           gamma*(1-pclin_v)*(1-age_testing_vector*ratetestEV)*screen_eff*(1-sigmaEV*ihr[,2])*EV+
+           gamma*selfis*(1-age_testing_vector*ratetestEVR)*pclin_v*(1-sigmaEVR*ihr[,2])*EVR+
+           gamma*(1-pclin_vr)*(1-age_testing_vector*ratetestEVR)*screen_eff*(1-sigmaEVR*ihr[,2])*EVR+
+           gamma*selfis*(1-age_testing_vector*ratetestER)*pclin_r*(1-sigmaER*ihr[,2])*ER+
+           gamma*(1-pclin_r)*(1-age_testing_vector*ratetestER)*screen_eff*(1-sigmaER*ihr[,2])*ER+
+           -nui*X+ageing%*%X-mort*X 
+         dVdt <- vaccinate*age_vaccine_vector*S + omega*VR - (1-vaccine_eff)*lam*V - vac_dur*V + ageing%*%V-mort*V - quarantine_rate*V
+         dEVdt<- (1-vaccine_eff)*lam*V - gamma*EV + ageing%*%EV - mort*EV - quarantine_rate*EV +(1/quarantine_days)*QEV
+         dERdt<- lam*sigmaR*R - gamma*ER + ageing%*%ER - mort*ER - quarantine_rate*ER +(1/quarantine_days)*QER
+         dVRdt <- vaccinate*age_vaccine_vector*E + vaccinate*age_vaccine_vector*I + vaccinate*age_vaccine_vector*R -
+           (1-vaccine_eff_r)*lam*VR - vac_dur_r*VR + ageing%*%VR - mort*VR - omega*VR - quarantine_rate*VR + (1/quarantine_days)*QVR
+         dEVRdt<- (1-vaccine_eff_r)*lam*VR - gamma*EVR + ageing%*%EVR-mort*EVR - quarantine_rate*EVR +
+           (1/quarantine_days)*QEVR
          
-         dQSdt <- quarantine_rate*S+ ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
+         
+         dQSdt <- quarantine_rate*S + ageing%*%QS-mort*QS - (1/quarantine_days)*QS - lamq*QS
          dQEdt <- quarantine_rate*E - gamma*QE + ageing%*%QE-mort*QE - (1/quarantine_days)*QE + lamq*QS 
-         dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE-nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
-         dQCdt <- gamma*pclin*(1-selfis)*(1-age_testing_vector*ratetestE)*(1-ihr[,2])*quarantine_rate*E+gamma*(1-ihr[,2])*pclin*QE-nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
-         dQRdt <- nui*QI+nui*QC+ageing%*%QR-mort*QR - (1/quarantine_days)*QR
+         dQIdt <- quarantine_rate*I + gamma*(1-ihr[,2])*(1-pclin)*QE+
+           gamma*(1-sigmaEV*ihr[,2])*(1-pclin_v)*QEV+
+           gamma*(1-sigmaER*ihr[,2])*(1-pclin_r)*QER+           
+           gamma*(1-sigmaEVR*ihr[,2])*(1-pclin_vr)*QEVR-
+           nui*QI+ageing%*%QI-mort*QI - (1/quarantine_days)*QI
+         dQCdt <- gamma*pclin*(1-selfis)*(1-age_testing_vector*ratetestE)*(1-ihr[,2])*quarantine_rate*E+
+           gamma*pclin_v*(1-age_testing_vector*ratetestEV)*(1-selfis)*(1-sigmaEV*ihr[,2])*quarantine_rate*EV+
+           gamma*pclin_vr*(1-age_testing_vector*ratetestEVR)*(1-selfis)*(1-sigmaEVR*ihr[,2])*quarantine_rate*EVR+
+           gamma*pclin_r*(1-age_testing_vector*ratetestER)*(1-selfis)*(1-sigmaER*ihr[,2])*quarantine_rate*ER+
+           gamma*(1-ihr[,2])*pclin*QE + 
+           gamma*(1-sigmaEV*ihr[,2])*pclin_v*QEV + 
+           gamma*(1-sigmaER*ihr[,2])*pclin_r*QER + 
+           gamma*(1-sigmaEVR*ihr[,2])*pclin_vr*QEVR -
+           nui*QC+ageing%*%QC-mort*QC - (1/quarantine_days)*QC
+         dQRdt <- quarantine_rate*R + nui*QI + nui*QC + ageing%*%QR-mort*QR - (1/quarantine_days)*QR + vac_dur_r*QVR
+         dQVdt <- quarantine_rate*V + ageing%*%QV-mort*QV - (1/quarantine_days)*QV - (1-vaccine_eff)*lamq*QV + omega*QVR 
+         dQEVdt <- quarantine_rate*EV - gamma*QEV + ageing%*%QEV-mort*QEV - (1/quarantine_days)*QEV + (1-vaccine_eff)*lamq*QV 
+         dQERdt <- quarantine_rate*ER - gamma*QER + ageing%*%QER-mort*QER - (1/quarantine_days)*QER + sigmaR*lamq*QR 
+         dQVRdt <- quarantine_rate*VR - (1-vaccine_eff_r)*lam*QVR - vac_dur_r*QVR - omega*QVR + ageing%*%QVR - mort*QVR 
+         dQEVRdt <- quarantine_rate*EVR - gamma*QEVR +ageing%*%QEVR-mort*QEVR -
+           (1/quarantine_days)*QEVR +(1-vaccine_eff_r)*lamq*QVR 
+            
          
-         dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*E + gamma*ihr[,2]*(1-prob_icu)*(1-critH)*QE - nus*H + ageing%*%H-mort*H  
-         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*(1-reporth)*E+gamma*ihr[,2]*(1-prob_icu)*critH*E + gamma*ihr[,2]*(1-prob_icu)*critH*QE - nusc*HC + ageing%*%HC-mort*HC 
-         dICUdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_v)*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-prob_v)*QE - nu_icu*ICU +ageing%*%ICU - mort*ICU +(1-crit)*ICUC*1/2
-         dICUCdt <- gamma*ihr[,2]*prob_icu*crit*(1-prob_v)*E + gamma*ihr[,2]*prob_icu*crit*(1-prob_v)*QE - 
+         dHdt <- gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*E+ 
+           gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*(1-critH)*reporth*EV + 
+           gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*(1-critH)*reporth*EVR + 
+           gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*(1-critH)*reporth*ER + 
+           gamma*ihr[,2]*(1-prob_icu)*(1-critH)*reporth*QE +
+           gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*(1-critH)*reporth*QEV + 
+           gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*(1-critH)*reporth*QEVR + 
+           gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*(1-critH)*reporth*QER - 
+           nus*H + ageing%*%H-mort*H 
+         dHCdt <- gamma*ihr[,2]*(1-prob_icu)*(1-reporth)*E+gamma*ihr[,2]*(1-prob_icu)*critH*reporth*E + 
+           gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*(1-reporth)*EV+gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*critH*reporth*EV+
+           gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*(1-reporth)*EVR+gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*critH*reporth*EVR+
+           gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*(1-reporth)*ER+gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*critH*reporth*ER +
+           gamma*ihr[,2]*(1-prob_icu)*(1-reporth)*QE+gamma*ihr[,2]*(1-prob_icu)*critH*reporth*QE+
+           gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*(1-reporth)*QEV+gamma*sigmaEV*ihr[,2]*(1-prob_icu_v)*critH*reporth*QEV+
+           gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*(1-reporth)*QEVR+gamma*sigmaEVR*ihr[,2]*(1-prob_icu_vr)*critH*reporth*QEVR+
+           gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*(1-reporth)*QER+gamma*sigmaER*ihr[,2]*(1-prob_icu_r)*critH*reporth*QER - 
+           nusc*HC + ageing%*%HC-mort*HC - ratetestHC*age_testing_vector*HC
+         dHCICUdt <- gamma*(1-reporth_ICU)*ihr[,2]*prob_icu*(1-prob_v)*E+
+           gamma*(1-reporth_ICU)*sigmaEV*ihr[,2]*prob_icu_v*(1-prob_v_v)*EV+
+           gamma*(1-reporth_ICU)*sigmaEVR*ihr[,2]*prob_icu_vr*(1-prob_v_vr)*EVR+
+           gamma*(1-reporth_ICU)*sigmaER*ihr[,2]*prob_icu_r*(1-prob_v_r)*ER+
+           gamma*(1-reporth_ICU)*ihr[,2]*prob_icu*(1-prob_v)*QE+
+           gamma*(1-reporth_ICU)*sigmaEV*ihr[,2]*prob_icu_v*(1-prob_v_v)*QEV+
+           gamma*(1-reporth_ICU)*sigmaEVR*ihr[,2]*prob_icu_vr*(1-prob_v_vr)*QEVR+
+           gamma*(1-reporth_ICU)*sigmaER*ihr[,2]*prob_icu_r*(1-prob_v_r)*QER-
+           nusc*HCICU + ageing%*%HCICU-mort*HCICU - ratetestHCICU*age_testing_vector*HCICU
+         dHCVdt <- gamma*(1-reporth_ICU)*ihr[,2]*prob_icu*prob_v*E+
+           gamma*(1-reporth_ICU)*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*EV+
+           gamma*(1-reporth_ICU)*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*EVR+
+           gamma*(1-reporth_ICU)*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*ER+
+           gamma*(1-reporth_ICU)*ihr[,2]*prob_icu*prob_v*QE+
+           gamma*(1-reporth_ICU)*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*QEV+
+           gamma*(1-reporth_ICU)*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*QEVR+
+           gamma*(1-reporth_ICU)*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*QER-
+           nu_ventc*HCV + ageing%*%HCV-mort*HCV - ratetestHCV*age_testing_vector*HCV 
+         dICUdt <- gamma*reporth_ICU*ihr[,2]*prob_icu*(1-crit)*(1-prob_v)*E+ 
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*(1-crit)*(1-prob_v_v)*EV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*(1-crit)*(1-prob_v_vr)*EVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*(1-crit)*(1-prob_v_r)*ER+
+           gamma*reporth_ICU*ihr[,2]*prob_icu*(1-crit)*(1-prob_v)*QE+ 
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*(1-crit)*(1-prob_v_v)*QEV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*(1-crit)*(1-prob_v_vr)*QEVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*(1-crit)*(1-prob_v_r)*QER - 
+           nu_icu*ICU +ageing%*%ICU - mort*ICU + (1-crit)*ICUC*1/2
+         dICUCdt <- gamma*reporth_ICU*ihr[,2]*prob_icu*crit*(1-prob_v)*E+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*crit*(1-prob_v_v)*EV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*crit*(1-prob_v_vr)*EVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*crit*(1-prob_v_r)*ER+
+           gamma*reporth_ICU*ihr[,2]*prob_icu*crit*(1-prob_v)*QE+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*crit*(1-prob_v_v)*QEV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*crit*(1-prob_v_vr)*QEVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*crit*(1-prob_v_r)*QER - 
            nu_icuc*ICUC -(1-crit)*ICUC*1/2 +ageing%*%ICUC - mort*ICUC 
-         dICUCVdt <- gamma*ihr[,2]*prob_icu*prob_v*crit*E +gamma*ihr[,2]*prob_icu*prob_v*crit*QE -nu_ventc*ICUCV +ageing%*%ICUCV - mort*ICUCV - (1-critV)*ICUCV*1/2
-         dVentdt <- gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_v*E + gamma*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_v*QE +(1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 -nu_vent*Vent +ageing%*%Vent - mort*Vent 
-         dVentCdt <- gamma*ihr[,2]*prob_icu*prob_v*(1-crit)*critV*E +gamma*ihr[,2]*prob_icu*prob_v*(1-crit)*critV*QE - 
+         dICUCVdt <- gamma*reporth_ICU*ihr[,2]*prob_icu*prob_v*crit*E+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*crit*EV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*crit*EVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*crit*ER+
+           gamma*reporth_ICU*ihr[,2]*prob_icu*prob_v*crit*QE+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*crit*QEV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*crit*QEVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*crit*QER -
+           nu_ventc*ICUCV +ageing%*%ICUCV - mort*ICUCV - (1-critV)*ICUCV*1/2
+         dVentdt <- gamma*reporth_ICU*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_v*E+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*(1-crit)*(1-critV)*prob_v_v*EV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*(1-crit)*(1-critV)*prob_v_vr*EVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*(1-crit)*(1-critV)*prob_v_r*ER+
+           gamma*reporth_ICU*ihr[,2]*prob_icu*(1-crit)*(1-critV)*prob_v*QE+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*(1-crit)*(1-critV)*prob_v_v*QEV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*(1-crit)*(1-critV)*prob_v_vr*QEVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*(1-crit)*(1-critV)*prob_v_r*QER +
+           (1-critV)*VentC*1/2 +(1-critV)*ICUCV*1/2 - nu_vent*Vent +ageing%*%Vent - mort*Vent 
+         dVentCdt <- gamma*reporth_ICU*ihr[,2]*prob_icu*prob_v*(1-crit)*critV*E+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*(1-crit)*critV*EV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*(1-crit)*critV*EVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*(1-crit)*critV*ER+
+           gamma*reporth_ICU*ihr[,2]*prob_icu*prob_v*(1-crit)*critV*QE+
+           gamma*reporth_ICU*sigmaEV*ihr[,2]*prob_icu_v*prob_v_v*(1-crit)*critV*QEV+
+           gamma*reporth_ICU*sigmaEVR*ihr[,2]*prob_icu_vr*prob_v_vr*(1-crit)*critV*QEVR+
+           gamma*reporth_ICU*sigmaER*ihr[,2]*prob_icu_r*prob_v_r*(1-crit)*critV*QER - 
            (1-critV)*VentC*1/2 -nu_ventc*VentC +ageing%*%VentC - mort*VentC 
          
+         # print(dexo2)
          dCdt <- report*gamma*(1-age_testing_vector*ratetestE)*(1-pclin)*(1-ihr[,2])*(E+QE)+reportc*gamma*pclin*(1-age_testing_vector*ratetestE)*(1-ihr[,2])*(E+QE)+
            gamma*ihr[,2]*(1-critH)*(1-prob_icu)*(E+QE)+gamma*ihr[,2]*critH*reporth*(1-prob_icu)*(E+QE)+
            gamma*ihr[,2]*prob_icu*(E+QE)+ratetestI*age_testing_vector*I+ratetestC*age_testing_vector*CL+gamma*age_testing_vector*ratetestE*(1-ihr[,2])*E
-         dCMdt<- nus*propo2*dexo2*pdeath_ho*ifr[,2]*H+nus*(1-propo2)*pdeath_h*ifr[,2]*H+nusc*propo2*pdeath_hco*ifr[,2]*HC+nusc*(1-propo2)*pdeath_hc*ifr[,2]*HC+
-           nu_icu*propo2*dexo2*pdeath_icuo*ifr[,2]*ICU+nu_icu*(1-propo2)*pdeath_icu*ifr[,2]*ICU+nu_icuc*propo2*dexo2c*pdeath_icuco*ifr[,2]*ICUC+nu_icuc*(1-propo2)*pdeath_icuc*ifr[,2]*ICUC+
-           nu_vent*dexv*pdeath_vent*ifr[,2]*Vent+nu_ventc*dexvc*pdeath_ventc*ifr[,2]*VentC +nu_ventc*dexvc*pdeath_ventc*ifr[,2]*ICUCV+ 
-           mort*H + mort*HC + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC  + mort*Z
+         dCMdt<- nus*propo2*dexo2*pdeath_ho*ifr[,2]*H+nus*(1-propo2)*pdeath_h*ifr[,2]*H+
+           nusc*report_death_HC*propo2*pdeath_hco*ifr[,2]*HC+nusc*report_death_HC*(1-propo2)*pdeath_hc*ifr[,2]*HC+
+           nu_icu*propo2*dexo2*pdeath_icuo*ifr[,2]*ICU+nu_icu*(1-propo2)*pdeath_icu*ifr[,2]*ICU+
+           nu_icuc*propo2*dexo2c*pdeath_icuco*ifr[,2]*ICUC+nu_icuc*(1-propo2)*pdeath_icuc*ifr[,2]*ICUC+
+           nu_vent*dexv*pdeath_vent*ifr[,2]*Vent+nu_ventc*dexvc*pdeath_ventc*ifr[,2]*VentC +
+           nu_ventc*dexvc*pdeath_ventc*ifr[,2]*ICUCV+ nu_ventc*pdeath_vent_hc*ifr[,2]*HCV+
+           nu_icuc*propo2*pdeath_icu_hco*ifr[,2]*HCICU+nu_icuc*(1-propo2)*pdeath_icu_hc*ifr[,2]*HCICU +
+           mort*H + mort*ICU + mort*ICUC + mort*ICUCV + mort*Vent + mort*VentC + mort*Z + 
+           report_death_HC*mort*HC + report_death_HC*mort*HCICU + report_death_HC*mort*HCV +
+           report_natdeathI*mort*I + report_natdeathI*mort*QI+ report_natdeathI*mort*E+
+           report_natdeathI*mort*QE + report_natdeathI*mort*EV+ report_natdeathI*mort*EVR+
+           report_natdeathI*mort*ER + report_natdeathI*mort*QEV+
+           report_natdeathI*mort*QEVR + report_natdeathI*mort*QER+
+           report_natdeathCL*mort*CL + report_natdeathCL*mort*QC + report_natdeathCL*mort*X
          dCMCdt <- nusc*propo2*pdeath_hco*ifr[,2]*HC+nusc*(1-propo2)*pdeath_hc*ifr[,2]*HC+
            nu_icuc*propo2*dexo2c*pdeath_icuco*ifr[,2]*ICUC+nu_icuc*(1-propo2)*pdeath_icuc*ifr[,2]*ICUC+
            nu_ventc*dexvc*pdeath_ventc*ifr[,2]*VentC+nu_ventc*dexvc*pdeath_ventc*ifr[,2]*ICUCV+
            mort*HC + mort*ICUC + mort*VentC + mort*ICUCV 
          
-         dZdt <- gamma*ratetestE*age_testing_vector*(1-ihr[,2])*E+ratetestI*age_testing_vector*I+ratetestC*age_testing_vector*CL-(1/isolation_days)*Z-mort*Z
+         dZdt <- gamma*ratetestE*age_testing_vector*(1-ihr[,2])*E+
+           ratetestI*age_testing_vector*I+
+           ratetestC*age_testing_vector*CL+
+           gamma*(1-ihr[,2])*ratetestEV*age_testing_vector*EV+
+           gamma*(1-ihr[,2])*ratetestEVR*age_testing_vector*EVR+
+           gamma*(1-ihr[,2])*ratetestER*age_testing_vector*ER+
+           ratetestHC*age_testing_vector*HC+
+           ratetestHCICU*age_testing_vector*HCICU+
+           ratetestHCV*age_testing_vector*HCV-
+           (1/isolation_days)*Z-mort*Z
+         
+         dAbdt <- nui*I+nui*X+nui*CL+ 
+           nus*propo2*(1-dexo2*pdeath_ho)*ifr[,2]*H+nus*(1-propo2)*(1-pdeath_h)*ifr[,2]*H+
+           nusc*propo2*(1-pdeath_hco)*ifr[,2]*HC+nusc*(1-propo2)*(1-pdeath_hc)*ifr[,2]*HC+  
+           nusc*propo2*(1-pdeath_icu_hco)*ifr[,2]*HCICU+nusc*(1-propo2)*(1-pdeath_icu_hc)*ifr[,2]*HCICU+
+           nu_ventc*(1-pdeath_vent_hc)*ifr[,2]*HCV+
+           nu_icu*propo2*(1-dexo2*pdeath_icuo)*ifr[,2]*ICU+nu_icu*(1-propo2)*(1-pdeath_icu)*ifr[,2]*ICU+
+           nu_icuc*propo2*(1-dexo2c*pdeath_icuco)*ifr[,2]*ICUC+nu_icuc*(1-propo2)*(1-pdeath_icuc)*ifr[,2]*ICUC+
+           nu_vent*(1-dexv*pdeath_vent)*ifr[,2]*Vent+
+           nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*VentC+
+           nu_ventc*(1-dexvc*pdeath_ventc)*ifr[,2]*ICUCV - 
+           seroneg*Ab - mort*Ab + ageing%*%Ab
+         
+         # print(paste("QEVR",sum(QEVR)))
          
          # return the rate of change
-         list(c(dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,dVentdt,dVentCdt,dCMCdt,dZdt))
+         list(c(S=dSdt,dEdt,dIdt,dRdt,dXdt,dHdt,dHCdt,dCdt,dCMdt,dVdt,dQSdt,dQEdt,dQIdt,dQRdt,dCLdt,dQCdt,dICUdt,dICUCdt,dICUCVdt,
+                dVentdt,dVentCdt,dCMCdt,dZdt,dEVdt,dERdt,dEVRdt,dVRdt,dQVdt,dQEVdt,dQEVRdt,dQERdt,dQVRdt,dHCICUdt,dHCVdt,dAbdt))
        }
   ) 
 }
 
 ###########    RUN BASELINE MODEL - start time for interventions is set to day 1e5, i.e. interventions are always off
 
-Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, initICUC, initICUCV, initVent, initVentC, initCMC, initZ) # initial conditions for the main solution vector
+Y<-c(initS,initE,initI,initR,initX,initH,initHC,initC,initCM,initV, initQS, initQE, initQI, initQR, initCL, initQC, initICU, 
+     initICUC, initICUCV, initVent, initVentC, initCMC,initZ, initEV, initER, initEVR, initVR, 
+     initQV,initQEV,initQEVR,initQER,initQVR,initHCICU,initHCV,initAb) # initial conditions for the main solution vector
 
+
+process_ode_outcome_mortality <- function(out_mean, intv_vector, param_used, print_death_summary = FALSE){
+    
+  cmortality1<-rowSums(out_mean[,(CMindex+1)]) # cumulative mortality, CM compartment
+  
+  results <- list()
+  results$time <- startdate + times  # dates
+  results$cum_mortality <- cmortality1  # cumulative mortality
+
+  ##########################    Time-varying parameters
+
+  # critH_hist<-c()
+  # crit_hist<-c()
+  # critV_hist<-c()
+  
+  # for (i in 1:length(times)){
+  #   critH_hist[i]<-min(1-fH((sum(out_mean[i,(Hindex+1)]))+sum(out_mean[i,(ICUCindex+1)])+sum(out_mean[i,(ICUCVindex+1)])),1)
+  #   crit_hist[i]<-min(1-fICU((sum(out_mean[i,(ICUindex+1)]))+(sum(out_mean[i,(Ventindex+1)]))+(sum(out_mean[i,(VentCindex+1)]))))
+  #   critV_hist[i]<-min(1-fVent((sum(out_mean[i,(Ventindex+1)]))),1)
+
+  #   to_keep = 10000000
+  #   critH_hist[i] = round(critH_hist[i] * to_keep) / to_keep
+  #   crit_hist[i]  = round(crit_hist[i]  * to_keep) / to_keep
+  #   critV_hist[i] = round(critV_hist[i] * to_keep) / to_keep
+
+  # }
+
+  prob_v_hist <- rep(param_used["prob_vent"],length(times))
+  dexo2_hist <- rep(0,length(times))
+  dexo2c_hist <- rep(0,length(times))
+  dexv_hist <- rep(0,length(times))
+  dexvc_hist <- rep(0,length(times))
+  for (tt in times) {
+    if(tt < max(times)){
+      if(intv_vector$dex[tt*20+1]) {
+        prob_v_hist[tt+1] <- param_used["prob_vent"]*param_used["vent_dex"]
+        dexo2_hist[tt+1] <- param_used["dexo2"]
+        dexo2c_hist[tt+1] <- param_used["dexo2c"]
+        dexv_hist[tt+1] <- param_used["dexv"]
+        dexvc_hist[tt+1] <- param_used["dexvc"]
+      } else {
+        prob_v_hist[tt+1] <- param_used["prob_vent"]
+        dexo2_hist[tt+1] <- 1
+        dexo2c_hist[tt+1] <- 1
+        dexv_hist[tt+1] <- 1
+        dexvc_hist[tt+1] <- 1
+      }
+    } else {
+      prob_v_hist[tt+1] <- prob_v_hist[tt]
+      dexo2_hist[tt+1] <- dexo2_hist[tt]
+      dexo2c_hist[tt+1] <- dexo2c_hist[tt]
+      dexv_hist[tt+1] <- dexv_hist[tt]
+      dexvc_hist[tt+1] <- dexvc_hist[tt]
+    }
+  }
+
+  ##########################    Death compartments
+
+  # Attributables
+  
+  cinc_mort_1 <- cumsum(rowSums(param_used["nus"]*param_used["propo2"]*param_used["pdeath_ho"]*dexo2_hist*(out_mean[,(Hindex+1)]%*%ifr[,2])))
+  cinc_mort_2 <- cumsum(rowSums(param_used["nus"]*(1-param_used["propo2"])*param_used["pdeath_h"]*(out_mean[,(Hindex+1)]%*%ifr[,2])))
+  
+  cinc_mort_3 <- cumsum(rowSums(param_used["nusc"]*param_used["report_death_HC"]*param_used["propo2"]*param_used["pdeath_hco"]*(out_mean[,(HCindex+1)]%*%ifr[,2])))
+  cinc_mort_4 <- cumsum(rowSums(param_used["nusc"]*param_used["report_death_HC"]*(1-param_used["propo2"])*param_used["pdeath_hc"]*(out_mean[,(HCindex+1)]%*%ifr[,2])))
+ 
+  cinc_mort_5 <- cumsum(rowSums(param_used["nu_icu"]*param_used["propo2"]*param_used["pdeath_icuo"]*dexo2_hist*(out_mean[,(ICUindex+1)]%*%ifr[,2])))
+  cinc_mort_6 <- cumsum(rowSums(param_used["nu_icu"]*(1-param_used["propo2"])*param_used["pdeath_icu"]*(out_mean[,(ICUindex+1)]%*%ifr[,2])))
+
+  cinc_mort_7 <- cumsum(rowSums(param_used["nu_icuc"]*param_used["propo2"]*param_used["pdeath_icuco"]*dexo2c_hist*(out_mean[,(ICUCindex+1)]%*%ifr[,2])))
+  cinc_mort_8 <- cumsum(rowSums(param_used["nu_icuc"]*(1-param_used["propo2"])*param_used["pdeath_icuc"]*(out_mean[,(ICUCindex+1)]%*%ifr[,2])))
+
+  
+  cinc_mort_9 <- cumsum(rowSums(param_used["nu_vent"]*param_used["pdeath_vent"]*dexv_hist*(out_mean[,(Ventindex+1)]%*%ifr[,2])))
+  cinc_mort_10 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mean[,(VentCindex+1)]%*%ifr[,2])))
+  cinc_mort_11 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_ventc"]*dexvc_hist*(out_mean[,(ICUCVindex+1)]%*%ifr[,2])))
+  
+  cinc_mort_14 <- cumsum(rowSums(param_used["nu_ventc"]*param_used["pdeath_vent_hc"]*(out_mean[,(HCVindex+1)]%*%ifr[,2])))
+  cinc_mort_12 <- cumsum(rowSums(param_used["nu_icuc"]*param_used["propo2"]*param_used["pdeath_icu_hco"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
+  cinc_mort_13 <- cumsum(rowSums(param_used["nu_icuc"]*(1-param_used["propo2"])*param_used["pdeath_icu_hc"]*(out_mean[,(HCICUindex+1)]%*%ifr[,2])))
+  
+  cinc_mort_H1 <- cinc_mort_1 + cinc_mort_2
+  cinc_mort_HC1 <- cinc_mort_3 + cinc_mort_4 + cinc_mort_12 + cinc_mort_13 + cinc_mort_14
+  cinc_mort_ICU1 <- cinc_mort_5 + cinc_mort_6
+  cinc_mort_ICUC1 <- cinc_mort_7 + cinc_mort_8
+  cinc_mort_Vent1 <- cinc_mort_9
+  cinc_mort_VentC1 <- cinc_mort_10
+  cinc_mort_ICUCV1 <- cinc_mort_11
+  
+  results$death_treated_hospital <- round(cinc_mort_H1)
+  results$death_untreated_hospital <- round(cinc_mort_HC1)
+  results$death_treated_icu <- round(cinc_mort_ICU1)
+  results$death_untreated_icu <- round(cinc_mort_ICUC1)
+  results$death_treated_ventilator <- round(cinc_mort_Vent1)
+  results$death_untreated_ventilator <- round(cinc_mort_VentC1)+round(cinc_mort_ICUCV1)
+  
+  results$attributable_deaths <-
+        results$death_treated_hospital + 
+        results$death_untreated_hospital + 
+        results$death_treated_icu + 
+        results$death_untreated_icu + 
+        results$death_treated_ventilator +
+        results$death_untreated_ventilator
+
+  results$attributable_deaths_end <- last(results$attributable_deaths)
+
+
+  # Natural deaths / exposed
+
+    base_mort_H1 <- cumsum(rowSums(out_mean[,(Hindex+1)]%*%mort))
+    base_mort_ICU1 <- cumsum(rowSums(out_mean[,(ICUindex+1)]%*%mort))
+    base_mort_ICUC1 <- cumsum(rowSums(out_mean[,(ICUCindex+1)]%*%mort))
+    base_mort_ICUCV1 <- cumsum(rowSums(out_mean[,(ICUCVindex+1)]%*%mort))
+    base_mort_Vent1 <- cumsum(rowSums(out_mean[,(Ventindex+1)]%*%mort))
+    base_mort_VentC1 <- cumsum(rowSums(out_mean[,(VentCindex+1)]%*%mort))
+    base_mort_Z1 <- cumsum(rowSums(out_mean[,(Zindex+1)]%*%mort))
+
+    base_mort_HC1   <- cumsum(rowSums(param_used["report_death_HC"]*out_mean[,(HCindex+1)]%*%mort))
+    base_mort_HCICU1<- cumsum(rowSums(param_used["report_death_HC"]*out_mean[,(HCICUindex+1)]%*%mort))
+    base_mort_HCV1  <- cumsum(rowSums(param_used["report_death_HC"]*out_mean[,(HCVindex+1)]%*%mort))
+
+    base_mort_I1    <- cumsum(rowSums(param_used["report_natdeathI"]*out_mean[,(Iindex+1)]%*%mort))
+    base_mort_QI1   <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(QIindex+1)]  %*%mort))
+    base_mort_E1    <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(Eindex+1)]   %*%mort))
+    base_mort_QE1   <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(QEindex+1)]  %*%mort))
+    base_mort_EV1   <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(EVindex+1)]  %*%mort))
+    base_mort_EVR1  <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(EVRindex+1)] %*%mort))
+    base_mort_ER1   <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(ERindex+1)]  %*%mort))
+    base_mort_QEV1  <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(QEVindex+1)] %*%mort))
+    base_mort_QEVR1 <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(QEVRindex+1)]%*%mort))
+    base_mort_QER1  <- cumsum(rowSums(param_used["report_natdeathI"] *out_mean[,(QERindex+1)] %*%mort))
+    base_mort_CL1   <- cumsum(rowSums(param_used["report_natdeathCL"]*out_mean[,(CLindex+1)]  %*%mort))
+    base_mort_QC1   <- cumsum(rowSums(param_used["report_natdeathCL"]*out_mean[,(QCindex+1)]  %*%mort))
+    base_mort_X1    <- cumsum(rowSums(param_used["report_natdeathCL"]*out_mean[,(Xindex+1)]   %*%mort))
+  
+
+
+  results$death_natural_exposed <- round(
+                                           base_mort_H1+
+                                           base_mort_HC1+
+                                           base_mort_ICU1+
+                                           base_mort_ICUC1+
+                                           base_mort_ICUCV1+
+                                           base_mort_Vent1+
+                                           base_mort_VentC1+
+                                           base_mort_Z1+
+                                           base_mort_HCICU1+
+                                           base_mort_HCV1+
+
+                                           base_mort_I1 + 
+                                           base_mort_QI1 + 
+                                           base_mort_E1 + 
+                                           base_mort_QE1 + 
+                                           base_mort_EV1+  
+                                           base_mort_EVR1+   
+                                           base_mort_ER1 + 
+                                           base_mort_QEV1 + 
+                                           base_mort_QEVR1 + 
+                                           base_mort_QER1 + 
+                                           base_mort_CL1 + 
+                                           base_mort_QC1 + 
+                                           base_mort_X1
+                                           
+                                           )
+
+  # Natural deaths / non-exposed
+
+  base_mort_S1 <- cumsum(rowSums(out_mean[,(Sindex+1)]%*%mort))
+  base_mort_V1 <- cumsum(rowSums(out_mean[,(Vindex+1)]%*%mort))
+  base_mort_QS1 <- cumsum(rowSums(out_mean[,(QSindex+1)]%*%mort))
+
+  base_mort_VR1 <- cumsum(rowSums(out_mean[,(VRindex+1)]%*%mort))
+  base_mort_QV1 <- cumsum(rowSums(out_mean[,(QVindex+1)]%*%mort))
+
+  base_mort_R1 <- cumsum(rowSums(out_mean[,(Rindex+1)]%*%mort))
+  base_mort_QR1 <- cumsum(rowSums(out_mean[,(QRindex+1)]%*%mort))
+  base_mort_QVR1 <- cumsum(rowSums(out_mean[,(QVRindex+1)]%*%mort))
+
+  results$death_natural_non_exposed <- round(
+                                        base_mort_S1+
+                                        base_mort_V1+
+                                        base_mort_QS1+
+                                        base_mort_VR1+
+                                        base_mort_QV1+
+                                        
+                                        base_mort_R1+ 
+                                        base_mort_QR1 + 
+                                        base_mort_QVR1
+                                        )
+  
+  ##########################    Summary
+  
+  results$total_reportable_deaths <-
+        results$attributable_deaths + 
+        results$death_natural_exposed
+
+  results$total_reportable_deaths_end <- 
+        last(results$total_reportable_deaths)
+
+  results$total_deaths <- 
+        results$total_reportable_deaths + 
+        results$death_natural_non_exposed
+  
+  results$total_deaths_end <- last(results$total_deaths)
+  
+  results$total_cm_deaths_end <- round(last(results$cum_mortality))
+
+  if (print_death_summary) {
+    cat(paste("\nDeath count\n\tTotal:", results$total_deaths_end, "\n"))
+    cat(paste("\t- Attributable:", results$attributable_deaths_end, "(reportable)\n"))   
+    cat(paste("\t- Natural Exposed:", last(results$death_natural_exposed), "(reportable)\n"))
+    cat(paste("\t- Natural Non-Exposed:", last(results$death_natural_non_exposed), "(non-reportable)\n"))
+    cat(paste("\tTotal Reportable:", results$total_reportable_deaths_end, "\n"))
+    cat("Death count (via CM for sum of all reportables):\n")
+    cat(paste("\tCM:", results$total_cm_deaths_end, "\n"))       
+  }
+
+  return(results)
+}

@@ -1,5 +1,5 @@
 importFrom(stats, splinefun)
 importFrom(Rcpp, evalCpp)
+importFrom(dplyr, arrange)
 useDynLib(comoOdeCpp, .registration=TRUE)
 exportPattern("^[[:alpha:]]+")
-
