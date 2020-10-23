@@ -2,6 +2,7 @@ language: r
 r: 3.6.3
 
 cache: packages
+warnings_are_errors: false
 
 r_packages:
   - covr
